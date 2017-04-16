@@ -75,6 +75,33 @@ var primitiveTypes = [
     'double',
     'string'
 ];
+var csTypeNames = {
+    'boolean': 'bool',
+    'byte': 'byte',
+    'short': 'short',
+    'long': 'int',
+    'long long': 'long',
+    'double': 'double',
+    'unsigned short': 'ushort',
+    'unsigned long': 'uint',
+    'unsigned long long': 'ulong',
+    'float': 'float',
+    'unrestricted float': 'float',
+    'double': 'double',
+    'unrestricted double': 'double',
+    'domstring': 'string',
+    'usvstring': 'string',
+    'object': 'object',
+    'void': 'void',
+    'arraybuffer': 'byte',
+    'arraybufferview': 'byte',
+    'domhighRestimestamp': 'TimeSpan',
+    'domtimestamp': 'TimeSpan',
+    'octet': 'byte',
+    'blob': 'FileInfo',
+    'record': 'map'
+};
+
 var primitiveDefault = {
     bool: false,
     byte: 0,
@@ -95,57 +122,20 @@ var useListClasses = [];
 
 function typeParse(typeElm) {
     var types = [];
-    var isArray = false;
-    var isSequence = false;
-    var isFrozen = false;
-    var isPromise = false;
-    var isNullable = false;
-    var isMapLike = false;
-    var isPrimitive = false;
-    var isVoid = false;
     var typeNames = getText(typeElm).replace(/\(|\)|\r|\n/g, '').split(' or ').map(x => x.trim());
+    var unknownTypes = [];
 
-    var setType = function (typeName) {
-        var csTypeNames = {
-            'boolean': 'bool',
-            'byte': 'byte',
-            'short': 'short',
-            'long': 'int',
-            'long long': 'long',
-            'double': 'double',
-            'unsigned short': 'ushort',
-            'unsigned long': 'uint',
-            'unsigned long long': 'ulong',
-            'domstring': 'string',
-            'usvstring': 'string',
-            'object': 'object',
-            'void': 'void',
-            'arraybuffer': 'byte',
-            'arraybufferview': 'byte',
-            'domhighRestimestamp': 'TimeSpan',
-            'domtimestamp': 'TimeSpan',
-            'octet': 'byte',
-            'blob': 'FileInfo'
-        };
-        isArray = isArray || ['arraybuffer', 'arraybufferview'].includes(typeName);
-        var type = {
-            type: csTypeNames[typeName.toLowerCase()] || typeName,
-            orgType: typeName
-        };
-        isPrimitive = primitiveTypes.includes(type.type);
-        isVoid = type.type === 'void';
-        if (isArray) type.isArray = true;
-        if (isSequence) type.isSequence = true;
-        if (isFrozen) type.isFrozen = true;
-        if (isPromise) type.isPromise = true;
-        if (isNullable) type.isNullable = true;
-        if (isPrimitive) type.isPrimitive = true;
-        if (isVoid) type.isVoid = true;
-        types.push(type);
-        isArray = isSequence = isFrozenArray = isPromise = isNullable = isMapLike = isPrimitive = isVoid = false;
-    };
+    typeNames = typeNames.map(typeName => {
+        var isArray = false;
+        var isSequence = false;
+        var isFrozen = false;
+        var isPromise = false;
+        var isNullable = false;
+        var isMapLike = false;
+        var isPrimitive = false;
+        var isVoid = false;
+        var isUnrestricted = false;
 
-    typeNames.forEach(typeName => {
         if (/sequence<(.+?)>/i.test(typeName)) {
             typeName = /sequence<(.+?)>/i.exec(typeName)[1];
             isArray = true;
@@ -162,15 +152,33 @@ function typeParse(typeElm) {
             isMapLike = true;
         } else if (typeName.endsWith('...')) {
             isArray = true;
-            typeName = typeName.replace('...', '');
+            typeName = typeName.replace('...', '').trim();
         } else if (typeName.endsWith('?')) {
             isNullable = true;
-            typeName = typeName.replace('?', '');
+            typeName = typeName.replace('?', '').trim();
+        } else if(typeName.startsWith('unrestricted')) {
+            isUnrestricted = true;
+            typeName = typeName.replace('unrestricted', '').trim();
         }
-        typeName.split(',').forEach(tn => {
-            setType(tn.trim());
-        });
+        
+        var type = {type: typeName};
+        isArray = isArray || ['arraybuffer', 'arraybufferview'].includes(typeName);
+        isPrimitive = primitiveTypes.includes(type.type);
+        isVoid = type.type === 'void';
+        if (isArray) type.isArray = true;
+        if (isSequence) type.isSequence = true;
+        if (isFrozen) type.isFrozen = true;
+        if (isPromise) type.isPromise = true;
+        if (isNullable) type.isNullable = true;
+        if (isPrimitive) type.isPrimitive = true;
+        if (isVoid) type.isVoid = true;
+        if (isUnrestricted) type.isUnrestricted = true;
+        return type;
     });
+
+    if(unknownTypes.length) {
+        throw `"${unknownTypes.join('", "')}" unknown types.`;
+    }
 
     return types;
 }
@@ -191,7 +199,7 @@ function camelize(txt, forceUpperCase) {
     }).join('');
 }
 
-function firstWordParse(target, parseData) {
+function firstKeywordParse(target, parseData) {
     var firstWord = getText(target).split(' ')[0];
     if (firstWord === 'readonly') parseData.isReadonly = true;
     if (firstWord === 'optional') parseData.isOptional = true;
@@ -212,7 +220,7 @@ function paramParse(target) {
             }
             prm.defaltValue = defaultValue;
         }
-        firstWordParse(param, prm);
+        firstKeywordParse(param, prm);
         params.push(prm);
     });
     return params;
@@ -322,17 +330,15 @@ function parseWebIDLminimum(doc) {
                 classStruct.attributes = classStruct.attributes || {};
                 attributes.forEach(attribute => {
                     var attrName = getText(attribute.querySelector('.idlAttrName'));
-                    var attr = {};
-                    firstWordParse(attribute, attr);
+                    firstKeywordParse(attribute, attr);
                     var types = typeParse(attribute.querySelector('.idlAttrType'));
                     if (types[0].type === 'EventHandler') {
                         classStruct.eventHandlers = classStruct.eventHandlers || [];
                         classStruct.eventHandlers.push(attrName);
                     } else {
+                        var attr = classStruct.attributes[attrName] = classStruct.attributes[attrName] || {};
                         attr.type = types;
-                        classStruct.attributes[attrName] = classStruct.attributes[attrName] || {};
                         extAttrParse(attribute, attr);
-                        Object.assign(classStruct.attributes[attrName], attr);
                     }
                 });
             }
@@ -340,11 +346,9 @@ function parseWebIDLminimum(doc) {
             if (members.length) {
                 classStruct.members = classStruct.members || {};
                 members.forEach(member => {
-                    var memName = getText(member.querySelector('.idlMemberName'));
-                    var mem = {
-                        type: typeParse(member.querySelector('.idlMemberType'))
-                    };
-                    classStruct.members[memName] = classStruct.members[memName] || {};
+                    var mem = classStruct.members[memName] = classStruct.members[memName] || {};
+                    mem.name = getText(member.querySelector('.idlMemberName'));;
+                    mem.type = typeParse(member.querySelector('.idlMemberType'));
                     var defaultValue = getText(member.querySelector('.idlMemberValue'));
                     if (defaultValue) {
                         if (mem.type[0].isPrimitive && mem.type[0].type !== 'string') {
@@ -353,50 +357,21 @@ function parseWebIDLminimum(doc) {
                         mem.defaltValue = defaultValue;
                     }
                     extAttrParse(member, mem);
-                    Object.assign(classStruct.members[memName], mem);
                 });
             }
 
             if (methods.length) {
                 classStruct.methods = classStruct.methods || {};
                 methods.some(method => {
-                    var methodName = getText(method.querySelector('.idlMethName'));
                     var returnType = typeParse(method.querySelector('.idlMethType'));
                     if (returnType.length > 1) {
-                        console.log(`parser error return type not one. kind=${kind} id=${id} methodName=${methodName}`);
+                        throw `parser error return type not one. kind=${kind} id=${id} methodName=${methodName}`;
                         return true;
                     }
-                    returnType = returnType[0];
-                    var params = method.querySelectorAll('.idlParam');
-                    var paramPatterns = [];
-                    generateParamPattern(0, [], paramParse(method), paramPatterns);
-                    var method = classStruct.methods[methodName] = classStruct.methods[methodName] || {};
-                    method.name = methodName;
-                    method.returnType = returnType;
-                    var flg = false;
-                    method.paramPatterns = method.paramPatterns || [];
-                    if (method.paramPatterns.lengh === 0) {
-                        method.paramPatterns.push(paramPatterns);
-                    } else {
-                        paramPatterns.some(ptnA => {
-                            method.paramPatterns.some(ptnB => {
-                                if (ptnA.length === ptnB.length) {
-                                    flg = true;
-                                    if (ptnA.length === 0) return true;
-                                    ptnB.forEach((ptn, i) => {
-                                        if (ptnA[i].type !== ptn.type) flg = false;
-                                    });
-                                    if (flg) {
-                                        return true;
-                                    }
-                                    return false;
-                                }
-                            });
-                            if (!flg) {
-                                method.paramPatterns.push(ptnA);
-                            }
-                        });
-                    }
+                    var meth = classStruct.methods[methodName] = classStruct.methods[methodName] || {};
+                    meth.name = getText(method.querySelector('.idlMethName'));
+                    meth.returnType = returnType[0];
+                    meth.params = paramParse(method);
                     return false;
                 });
             }
@@ -405,15 +380,15 @@ function parseWebIDLminimum(doc) {
                 classStruct.items = classStruct.items || [];
                 enumItems.forEach(item => {
                     var rawTxt = item.textContent.replace(/"/g, '');
-                    var txt = camelize(rawTxt);
-                    if (txt === 'new') txt = 'New';
-                    classStruct.items.push({ item: txt, rawItem: rawTxt });
+                    var item = camelize(rawTxt);
+                    if (item === 'new') item = 'New';
+                    classStruct.items.push(item);
                 });
             }
 
             if (maplikes.length) { // TODO
                 classStruct.map = {};
-                firstWordParse(maplikes[0], classStruct.map);
+                firstKeywordParse(maplikes[0], classStruct.map);
                 typeParse(maplikes[0], classStruct.map);
             }
         }
@@ -421,7 +396,7 @@ function parseWebIDLminimum(doc) {
 
     console.log(JSON.stringify(classStructs, null, 2));
     //console.log(classStructs);
-    generateCS(classStructs);
+    //generateCS(classStructs);
     //WebRTCSpecCoverageCheck(classStructs);
 }
 
