@@ -358,13 +358,9 @@ function parseWebIDLminimum(doc) {
             }
 
             if (methods.length) {
-                if (id === 'RTCDataChannel') debugger;
                 classStruct.methods = classStruct.methods || {};
                 methods.some(method => {
                     var methodName = getText(method.querySelector('.idlMethName'));
-                    if(id === 'RTCDataChannel') {
-                        console.log(methodName);
-                    }
                     var returnType = typeParse(method.querySelector('.idlMethType'));
                     if (returnType.length > 1) {
                         console.log(`parser error return type not one. kind=${kind} id=${id} methodName=${methodName}`);
@@ -374,22 +370,19 @@ function parseWebIDLminimum(doc) {
                     var params = method.querySelectorAll('.idlParam');
                     var paramPatterns = [];
                     generateParamPattern(0, [], paramParse(method), paramPatterns);
-                    if (classStruct.methods[methodName]) {
-                        if (classStruct.methods[methodName].returnType.type !== returnType.type) {
-                            console.log(`parser error return type not one. kind=${kind} id=${id} methodName=${methodName}`);
-                            return true;
-                        }
+                    var method = classStruct.methods[methodName] = classStruct.methods[methodName] || {};
+                    method.name = methodName;
+                    method.returnType = returnType;
+                    var flg = false;
+                    method.paramPatterns = method.paramPatterns || [];
+                    if (method.paramPatterns.lengh === 0) {
+                        method.paramPatterns.push(paramPatterns);
                     } else {
-                        var method = classStruct.methods[methodName] = classStruct.methods[methodName] || {};
-                        method.name = methodName;
-                        method.returnType = returnType;
-                        var flg = false;
-                        method.paramPatterns = method.paramPatterns || [];
-                        method.paramPatterns.some(ptnA => {
-                            paramPatterns.some(ptnB => {
+                        paramPatterns.some(ptnA => {
+                            method.paramPatterns.some(ptnB => {
                                 if (ptnA.length === ptnB.length) {
                                     flg = true;
-                                    if(ptnA.length === 0) return true;
+                                    if (ptnA.length === 0) return true;
                                     ptnB.forEach((ptn, i) => {
                                         if (ptnA[i].type !== ptn.type) flg = false;
                                     });
@@ -403,8 +396,8 @@ function parseWebIDLminimum(doc) {
                                 method.paramPatterns.push(ptnA);
                             }
                         });
-                        return false;
                     }
+                    return false;
                 });
             }
 
@@ -426,7 +419,7 @@ function parseWebIDLminimum(doc) {
         }
     });
 
-    //console.log(JSON.stringify(classStructs, null, 2));
+    console.log(JSON.stringify(classStructs, null, 2));
     //console.log(classStructs);
     generateCS(classStructs);
     //WebRTCSpecCoverageCheck(classStructs);
@@ -722,7 +715,7 @@ function generateCS(classStructs, arrayToList) {
                     }
 
                     if (data.methods) {
-                        if(id === 'RTCDataChannel') debugger;
+                        if (id === 'RTCDataChannel') debugger;
                         Object.keys(data.methods).forEach(methodName => {
                             var method = data.methods[methodName];
                             method.paramPatterns.forEach(paramPattern => {
