@@ -1,26 +1,3 @@
-var xhr = new XMLHttpRequest();
-xhr.open('GET', 'https://www.w3.org/TR/webrtc/');
-xhr.responseType = 'document';
-xhr.onload = evt => {
-    var idlClasses = [];
-    Array.from(document.querySelectorAll('*'))
-        .filter(elm => elm.className.startsWith('idl'))
-        .forEach(idl => {
-            if (!idlClasses.includes(idl.className)) idlClasses.push(idl.className);
-        });
-    idlClasses.sort();
-    var unknownClasses = idlClasses.filter(className => !knownClasses.includes(className));
-    if (unknownClasses.length) {
-        console.log(`["${unknownClasses.join(", ")}"] unknown class`);
-    } else {
-        var doc = xhr.responseXML;
-        var legacyInterface = doc.getElementById('legacy-interface-extensions');
-        legacyInterface.parentElement.removeChild(legacyInterface);
-        parseWebIDLminimum(doc);
-    }
-}
-xhr.send();
-
 var knownKindClassNames = [
     'idlCallback',
     'idlDictionary',
@@ -28,22 +5,33 @@ var knownKindClassNames = [
     'idlInterface'
 ];
 var knownClasses = [
+    'idl',
     'idlAttrName',
     'idlAttrType',
     'idlAttribute',
     'idlCallback',
     'idlCallbackID',
     'idlCallbackType',
+    'idlConst',
+    'idlConstName',
+    'idlConstType',
+    'idlConstValue',
     'idlCtor',
+    'idlCtorName',
     'idlDefaultValue',
     'idlDictionary',
     'idlDictionaryID',
     'idlEnum',
     'idlEnumID',
     'idlEnumItem',
+    'idlImplements',
+    'idlImplementsDesc',
     'idlInterface',
     'idlInterfaceID',
+    'idlIterable',
     'idlMaplike',
+    'idlMaplikeKeyType',
+    'idlMaplikeValueType',
     'idlMember',
     'idlMemberName',
     'idlMemberType',
@@ -54,11 +42,20 @@ var knownClasses = [
     'idlParam',
     'idlParamName',
     'idlParamType',
+    'idlParamValue',
     'idlSectionComment',
     'idlSerializer',
     'idlSerializerValues',
     'idlSuperclass',
-    'idlType internalDFN'
+    'idlTitle',
+    'idlType',
+    'idlTypedef',
+    'idlTypedefID',
+    'idlTypedefType',
+    'idlattr',
+    'idlinterface',
+    'idltype',
+    'idlvalue'
 ];
 var primitiveTypes = [
     'void',
@@ -120,73 +117,6 @@ var typeClassNames = [];
 var nullObj = { textContent: '' };
 var useListClasses = [];
 
-function typeParse(typeElm) {
-    var types = [];
-    var typeNames = getText(typeElm).replace(/\(|\)|\r|\n/g, '').split(' or ').map(x => x.trim());
-    var unknownTypes = [];
-
-    typeNames = typeNames.map(typeName => {
-        var isArray = false;
-        var isSequence = false;
-        var isFrozen = false;
-        var isPromise = false;
-        var isNullable = false;
-        var isMapLike = false;
-        var isPrimitive = false;
-        var isVoid = false;
-        var isUnrestricted = false;
-
-        if (/sequence<(.+?)>/i.test(typeName)) {
-            typeName = /sequence<(.+?)>/i.exec(typeName)[1];
-            isArray = true;
-            isSequence = true;
-        } else if (/frozenarray<(.+?)>/i.test(typeName)) {
-            typeName = /frozenarray<(.+?)>/i.exec(typeName)[1];
-            isArray = true;
-            isFrozen = true;
-        } else if (/promise<(.+?)>/i.test(typeName)) {
-            typeName = /promise<(.+?)>/i.exec(typeName)[1];
-            isPromise = true;
-        } else if (/maplike<(.+?)>/i.test(typeName)) {
-            typeName = /maplike<(.+?)>/i.exec(typeName)[1];
-            isMapLike = true;
-        } else if (typeName.endsWith('...')) {
-            isArray = true;
-            typeName = typeName.replace('...', '').trim();
-        } else if (typeName.endsWith('?')) {
-            isNullable = true;
-            typeName = typeName.replace('?', '').trim();
-        } else if(typeName.startsWith('unrestricted')) {
-            isUnrestricted = true;
-            typeName = typeName.replace('unrestricted', '').trim();
-        }
-        
-        var type = {type: typeName};
-        isArray = isArray || ['arraybuffer', 'arraybufferview'].includes(typeName);
-        isPrimitive = primitiveTypes.includes(type.type);
-        isVoid = type.type === 'void';
-        if (isArray) type.isArray = true;
-        if (isSequence) type.isSequence = true;
-        if (isFrozen) type.isFrozen = true;
-        if (isPromise) type.isPromise = true;
-        if (isNullable) type.isNullable = true;
-        if (isPrimitive) type.isPrimitive = true;
-        if (isVoid) type.isVoid = true;
-        if (isUnrestricted) type.isUnrestricted = true;
-        return type;
-    });
-
-    if(unknownTypes.length) {
-        throw `"${unknownTypes.join('", "')}" unknown types.`;
-    }
-
-    return types;
-}
-
-function getText(elm) {
-    return (elm || nullObj).textContent.trim();
-}
-
 function camelize(txt, forceUpperCase) {
     return txt.split('-').map((elm, idx) => {
         var arr = elm.split('');
@@ -197,51 +127,6 @@ function camelize(txt, forceUpperCase) {
         }
         return arr.join('');
     }).join('');
-}
-
-function firstKeywordParse(target, parseData) {
-    var firstWord = getText(target).split(' ')[0];
-    if (firstWord === 'readonly') parseData.isReadonly = true;
-    if (firstWord === 'optional') parseData.isOptional = true;
-    if (firstWord === 'required') parseData.isRequired = true;
-}
-
-function paramParse(target) {
-    var params = [];
-    target.querySelectorAll('.idlParam').forEach(param => {
-        var prm = {
-            name: getText(param.querySelector('.idlParamName')),
-            type: typeParse(param.querySelector('.idlParamType'))
-        };
-        var defaultValue = getText(param.querySelector('.idlMemberValue'));
-        if (defaultValue) {
-            if (prm.type[0].isPrimitive && prm.type[0].type !== 'string') {
-                defaltValue = +defaultValue;
-            }
-            prm.defaltValue = defaultValue;
-        }
-        firstKeywordParse(param, prm);
-        params.push(prm);
-    });
-    return params;
-}
-
-function extAttrParse(target, parseData) {
-    var extAttrElms = target.querySelectorAll(':scope > .extAttr');
-    var extAttrs = [];
-    extAttrs.forEach(elm => {
-        var extAttr = {};
-        extAttr.name = getText(elm.querySelector('extAttrName'));
-        extAttr.rhs = getText(elm.querySelector('extAttrRhs'));
-        extAttrs.push(extAttr);
-    });
-    var extAttrNameElms = target.querySelectorAll(':scope > .extAttrName');
-    extAttrs.forEach(elm => {
-        var extAttr = {};
-        extAttr.name = elm.textContent;
-        extAttrs.push(extAttr);
-    });
-    if (extAttrs.length) parseData.extAttrs = extAttrs;
 }
 
 function generateParamPattern(idx, ptn, src, result) {
@@ -275,123 +160,206 @@ function collectIdlClassName(elm) {
     });
 }
 
-function parseWebIDLminimum(doc) {
-    useListClasses = [];
-    classStructs = {};
-    doc.querySelectorAll('.def.idl').forEach(idl => {
-        jsIndentLevel = jsIndentLevel = 0;
-        var kindClassName = idl.firstChild.className;
-        var kind = {
-            idlDictionary: 'dictionary',
-            idlEnum: 'enum',
-            idlInterface: 'interface',
-            idlCallback: 'callback'
-        }[kindClassName];
-        var id = getText(idl.querySelector(`.${kindClassName}ID`));
-        classStructs[kind] = classStructs[kind] || {};
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'https://www.w3.org/TR/webrtc/');
+xhr.responseType = 'document';
+xhr.onload = evt => {
+    var idlClasses = [];
+    Array.from(document.querySelectorAll('*'))
+        .filter(elm => elm.className.startsWith('idl'))
+        .forEach(idl => {
+            if (!idlClasses.includes(idl.className)) idlClasses.push(idl.className);
+        });
+    idlClasses.sort();
+    var unknownClasses = idlClasses.filter(className => !knownClasses.includes(className));
+    if (unknownClasses.length) {
+        console.log(`["${unknownClasses.join(", ")}"] unknown class`);
+    } else {
+        var doc = xhr.responseXML;
+        var legacyInterface = doc.getElementById('legacy-interface-extensions');
+        legacyInterface.parentElement.removeChild(legacyInterface);
+        parseWebIDLminimum(doc);
+    }
+}
+xhr.send();
 
-        if (id) {
-            var superClassName = getText(idl.querySelector('.idlSuperclass'));
-            var ctor = idl.querySelector('.idlCtor');
-            var attributes = idl.querySelectorAll('.idlAttribute');
-            var members = Array.from(idl.querySelectorAll('.idlMember'));
-            var methods = Array.from(idl.querySelectorAll('.idlMethod'));
-            var enumItems = idl.querySelectorAll('.idlEnumItem');
-            var callback = idl.querySelector('.idlCallback');
-            var maplikes = idl.querySelectorAll('.idlMaplike');
+function extAttrParse(target, parseData) {
+    var extAttrElms = target.querySelectorAll(':scope > .extAttr');
+    var extAttrs = [];
+    extAttrs.forEach(elm => {
+        var extAttr = {};
+        extAttr.name = getText(elm.querySelector('extAttrName'));
+        extAttr.rhs = getText(elm.querySelector('extAttrRhs'));
+        extAttrs.push(extAttr);
+    });
+    var extAttrNameElms = target.querySelectorAll(':scope > .extAttrName');
+    extAttrs.forEach(elm => {
+        var extAttr = {};
+        extAttr.name = elm.textContent;
+        extAttrs.push(extAttr);
+    });
+    if (extAttrs.length) parseData.extAttrs = extAttrs;
+}
 
-            if (enumItems.length) {
-                idlEnums.push({ id: id, code: idl.textContent });
-            } else {
-                idlCodes.push({ id: id, code: idl.textContent });
+function getText(elm) {
+    return (elm || nullObj).textContent.trim();
+}
+
+function firstKeywordParse(target, parseData) {
+    var firstWord = getText(target).split(' ')[0];
+    if (firstWord === 'readonly') parseData.isReadonly = true;
+    if (firstWord === 'optional') parseData.isOptional = true;
+    if (firstWord === 'required') parseData.isRequired = true;
+}
+
+function paramParse(target) {
+    var params = [];
+    target.querySelectorAll('.idlParam').forEach(param => {
+        var prm = {
+            name: getText(param.querySelector('.idlParamName')),
+            type: typeParse(param.querySelector('.idlParamType'))
+        };
+        var defaultValue = getText(param.querySelector('.idlMemberValue'));
+        if (defaultValue) {
+            if (prm.type[0].isPrimitive && prm.type[0].type !== 'string') {
+                defaltValue = +defaultValue;
             }
-
-            classStructs[kind][id] = classStructs[kind][id] || {};
-            var classStruct = classStructs[kind][id];
-            extAttrParse(idl, classStruct);
-
-            if (superClassName) {
-                classStruct.superClass = superClassName;
-                if (superClassName === 'Event') superClassName = 'EventArg';
-            }
-
-            if (ctor) {
-                classStruct.constructor = {
-                    params: paramParse(ctor)
-                };
-                extAttrParse(ctor, classStruct.constructor);
-            }
-
-            if (callback) {
-                classStruct.params = paramParse(callback);
-            }
-
-            if (attributes.length) {
-                classStruct.attributes = classStruct.attributes || {};
-                attributes.forEach(attribute => {
-                    var attrName = getText(attribute.querySelector('.idlAttrName'));
-                    firstKeywordParse(attribute, attr);
-                    var types = typeParse(attribute.querySelector('.idlAttrType'));
-                    if (types[0].type === 'EventHandler') {
-                        classStruct.eventHandlers = classStruct.eventHandlers || [];
-                        classStruct.eventHandlers.push(attrName);
-                    } else {
-                        var attr = classStruct.attributes[attrName] = classStruct.attributes[attrName] || {};
-                        attr.type = types;
-                        extAttrParse(attribute, attr);
-                    }
-                });
-            }
-
-            if (members.length) {
-                classStruct.members = classStruct.members || {};
-                members.forEach(member => {
-                    var mem = classStruct.members[memName] = classStruct.members[memName] || {};
-                    mem.name = getText(member.querySelector('.idlMemberName'));;
-                    mem.type = typeParse(member.querySelector('.idlMemberType'));
-                    var defaultValue = getText(member.querySelector('.idlMemberValue'));
-                    if (defaultValue) {
-                        if (mem.type[0].isPrimitive && mem.type[0].type !== 'string') {
-                            defaltValue = +defaultValue;
-                        }
-                        mem.defaltValue = defaultValue;
-                    }
-                    extAttrParse(member, mem);
-                });
-            }
-
-            if (methods.length) {
-                classStruct.methods = classStruct.methods || {};
-                methods.some(method => {
-                    var returnType = typeParse(method.querySelector('.idlMethType'));
-                    if (returnType.length > 1) {
-                        throw `parser error return type not one. kind=${kind} id=${id} methodName=${methodName}`;
-                        return true;
-                    }
-                    var meth = classStruct.methods[methodName] = classStruct.methods[methodName] || {};
-                    meth.name = getText(method.querySelector('.idlMethName'));
-                    meth.returnType = returnType[0];
-                    meth.params = paramParse(method);
-                    return false;
-                });
-            }
-
-            if (enumItems.length) {
-                classStruct.items = classStruct.items || [];
-                enumItems.forEach(item => {
-                    var rawTxt = item.textContent.replace(/"/g, '');
-                    var item = camelize(rawTxt);
-                    if (item === 'new') item = 'New';
-                    classStruct.items.push(item);
-                });
-            }
-
-            if (maplikes.length) { // TODO
-                classStruct.map = {};
-                firstKeywordParse(maplikes[0], classStruct.map);
-                typeParse(maplikes[0], classStruct.map);
-            }
+            prm.defaltValue = defaultValue;
         }
+        firstKeywordParse(param, prm);
+        params.push(prm);
+    });
+    return params;
+}
+
+function typeParse(typeElm) {
+    if (!typeElm) return null;
+
+    var types = [];
+    var typeNames = getText(typeElm).replace(/\(|\)|\r|\n/g, '').split(' or ').map(x => x.trim());
+    var unknownTypes = [];
+
+    typeNames = typeNames.map(typeName => {
+        var isArray = false;
+        var isSequence = false;
+        var isFrozen = false;
+        var isPromise = false;
+        var isNullable = false;
+        var isMapLike = false;
+        var isPrimitive = false;
+        var isVoid = false;
+        var isUnrestricted = false;
+        var isIterable = false;
+
+        if (/sequence<(.+?)>/i.test(typeName)) {
+            typeName = /sequence<(.+?)>/i.exec(typeName)[1];
+            isArray = true;
+            isSequence = true;
+        } else if (/frozenarray<(.+?)>/i.test(typeName)) {
+            typeName = /frozenarray<(.+?)>/i.exec(typeName)[1];
+            isArray = true;
+            isFrozen = true;
+        } else if (/promise<(.+?)>/i.test(typeName)) {
+            typeName = /promise<(.+?)>/i.exec(typeName)[1];
+            isPromise = true;
+        } else if (/maplike<(.+?)>/i.test(typeName)) {
+            typeName = /maplike<(.+?)>/i.exec(typeName)[1];
+            isMapLike = true;
+        } else if (/iterable<(.+?)>/i.exec(typeName)) {
+            typeName = /maplike<(.+?)>/i.exec(typeName)[1];
+            isIterable = true;
+        } else if (typeName.endsWith('...')) {
+            isArray = true;
+            typeName = typeName.replace('...', '').trim();
+        } else if (typeName.endsWith('?')) {
+            isNullable = true;
+            typeName = typeName.replace('?', '').trim();
+        } else if (typeName.startsWith('unrestricted')) {
+            isUnrestricted = true;
+            typeName = typeName.replace('unrestricted', '').trim();
+        }
+        typeName.split(',').forEach(tn => {
+            var type = { type: tn.trim() };
+            isArray = isArray || ['arraybuffer', 'arraybufferview'].includes(typeName);
+            isPrimitive = primitiveTypes.includes(type.type);
+            isVoid = type.type === 'void';
+            if (isArray) type.isArray = true;
+            if (isSequence) type.isSequence = true;
+            if (isFrozen) type.isFrozen = true;
+            if (isPromise) type.isPromise = true;
+            if (isNullable) type.isNullable = true;
+            if (isPrimitive) type.isPrimitive = true;
+            if (isVoid) type.isVoid = true;
+            if (isUnrestricted) type.isUnrestricted = true;
+            types.push(type);
+        });
+        return type;
+    });
+
+    return types;
+}
+
+
+function kindParse(categoryElm, categoryItemData, kind, callback) {
+    var KindElms = categoryElm.querySelectorAll(`.idl${kind}`);
+    if (KindElms.length) {
+        var kindData = categoryItemData[kind] = categoryItemData[kind] || {};
+        kindElms.forEach(elm => {
+            firstKeywordParse(elm, kindData);
+            extAttrParse(elm, kindItemData);
+            var name = getText(elm.querySelector(`.idl${kind}Name`));
+            var kindItemData = name ? kindData[name] : kindData;
+            var types = typeParse(elm.querySelector(`.idlType, .idl${kind}Type`));
+            var params = paramParse(elm);
+            if(types) {
+                if (types[0].type === 'EventHandler') {
+                    kindData.eventHandlers = kindData.eventHandlers || [];
+                    kindData.eventHandlers.push(name);
+                } else {
+                    kindItemData.types = types;
+                }
+            }
+            var defaultValue = getText(elm.querySelector(`.idl${kind}Value`));
+            if (defaultValue) {
+                if (kindItemData.type[0].isPrimitive && kindItemData.type[0].type !== 'string') {
+                    defaltValue = +defaultValue;
+                }
+                kindItemData.defaltValue = defaultValue;
+            }
+            if (callback) {
+                callback(elm, elm.textContent, name, kindItemData);
+            }
+        });
+    }
+}
+
+function parseWebIDLminimum(doc) {
+    var parseData = {};
+
+    var categories = Array.from(doc.querySelectorAll('.idl *[class$=ID]'))
+        .map(elm => elm.className.replace(/^idl(.+?)ID$/, (a, b) => b))
+        .filter((val, idx, arr) => arr.indexOf(val) === idx);
+
+    categories.forEach(category => {
+        var categoryData = parseData[category] || {};
+
+        doc.querySelectorAll(`.idl${category}`).forEach(categoryElm => {
+            var id = getText(categoryElm.querySelector(`.idl${category}ID`));
+            var categoryItemData = categoryData[id] = categoryData[id] || {};
+
+            extAttrParse(categoryElm, attr);
+
+            kindParse(categoryElm, categoryItemData, 'Superclass');
+            kindParse(categoryElm, categoryItemData, 'Ctor');
+            kindParse(categoryElm, categoryItemData, 'Attribute');
+            kindParse(categoryElm, categoryItemData, 'Member');
+            kindParse(categoryElm, categoryItemData, 'EnumItem', (elm, txt, name, data) => {
+                data.items = data.items || [];
+                data.items.push(txt.replace(/"/g, ''));
+            });
+            kindParse(categoryElm, categoryItemData, 'Callback');
+            kindParse(categoryElm, categoryItemData, 'Maplike');
+        });
     });
 
     console.log(JSON.stringify(classStructs, null, 2));
