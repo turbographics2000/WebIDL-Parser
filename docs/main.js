@@ -1,4 +1,4 @@
-fetch('https://www.w3.org/TR/tr-groups-all')
+fetch('https://www.w3.org/TR/webrtc/')
     .then(res => res.text())
     .then(resText => {
         var domParser = new DOMParser();
