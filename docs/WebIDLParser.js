@@ -117,6 +117,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
     if (memberElms.length) {
         var memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
         memberElms.forEach(elm => {
+            memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
             memberName = memberName || elm.textContent;
             var memberItemData = name ? memberData[memberName] : memberData;
