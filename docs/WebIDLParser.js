@@ -123,7 +123,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-if(memberName === 'iceCandidatePoolSize') debugger;
+
             firstKeywordParse(elm, memberItemData);
 
             extAttrParse(elm, memberItemData);
@@ -224,17 +224,21 @@ function paramParse(target) {
 function typeParse(typeElm) {
     if (!typeElm) return null;
 
-    var type = {};
+    var types = [];
     var typeName = getText(typeElm);
-    var res = /([a-z]+?)<(.+?)>/i.exec(typeName);
-    if (res) {
-        type[res[1]] = true;
-        typeName = res[2];
-    }
     var typeNames = [];
-    typeName.replace(/\(|\)|\r|\n/g, '').split(' or ').forEach(x => typeNames = typeNames.concat(x.split(',').map(y => y.trim())));
-    type.typeName = typeNames;
-    return type;
+    typeName.replace(/\(|\)|\r|\n/g, '').split(' or ').forEach(x => {
+        var type = {};
+        var res = /([a-z]+?)<(.+?)>/i.exec(x.trim());
+        if (res) {
+            type[res[1]] = true;
+            typeName = res[2];
+        }
+        typeNames = typeNames.concat(x.split(',').map(y => y.trim()))
+        type.typeName = typeNames;
+        types.push(type);
+    });
+    return types;
 }
 
 
