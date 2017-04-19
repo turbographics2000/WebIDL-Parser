@@ -225,16 +225,16 @@ function typeParse(typeElm) {
     if (!typeElm) return null;
 
     var types = [];
-    var typeName = getText(typeElm);
-    var typeNames = [];
-    typeName.replace(/\(|\)|\r|\n/g, '').split(' or ').forEach(x => {
+    var txt = getText(typeElm);
+    txt.replace(/\(|\)|\r|\n/g, '').split(' or ').forEach(typeName => {
+        var res = /([a-z]+?)<(.+?)>/i.exec(typeName);
         var type = {};
-        var res = /([a-z]+?)<(.+?)>/i.exec(x.trim());
         if (res) {
             type[res[1]] = true;
             typeName = res[2];
         }
-        type.typeName = typeName.split(',').map(x => x.trim());
+        var typeNames = typeName.split(',').map(x => x.trim());
+        type.typeNames = typeNames;
         types.push(type);
     });
     return types;
