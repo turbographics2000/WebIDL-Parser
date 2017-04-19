@@ -120,7 +120,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
             memberName = memberName || getText(elm);
-            var memberItemData = memberName ? memberData[memberName] : memberData;
+            var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
 
             firstKeywordParse(elm, memberItemData);
 
