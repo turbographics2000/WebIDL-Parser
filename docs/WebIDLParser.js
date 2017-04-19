@@ -148,7 +148,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 memberItemData.defaltValue = defaultValue;
             }
 
-            if(!Object.keys(memberItemData).length) {
+            if(memberKind === 'Superclass') {
                 memberData = getText(elm);
             }
         });
