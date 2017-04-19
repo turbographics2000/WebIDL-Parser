@@ -123,7 +123,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-
+if(memberName === 'iceCandidatePoolSize') debugger;
             firstKeywordParse(elm, memberItemData);
 
             extAttrParse(elm, memberItemData);
