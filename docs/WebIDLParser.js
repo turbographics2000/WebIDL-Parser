@@ -198,9 +198,9 @@ function getText(elm) {
 
 function firstKeywordParse(target, parseData) {
     var firstWord = getText(target).split(' ')[0];
-    if (firstWord === 'readonly') parseData.isReadonly = true;
-    if (firstWord === 'optional') parseData.isOptional = true;
-    if (firstWord === 'required') parseData.isRequired = true;
+    if (firstWord === 'readonly') parseData.readonly = true;
+    if (firstWord === 'optional') parseData.optional = true;
+    if (firstWord === 'required') parseData.required = true;
 }
 
 function paramParse(target) {
