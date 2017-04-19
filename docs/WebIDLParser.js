@@ -128,9 +128,9 @@ function memberParse(groupElm, groupItemData, memberKind) {
 
             extAttrParse(elm, memberItemData);
 
-            var type = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
-            if (type) {
-                if (type.typeName[0] === 'EventHandler') {
+            var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
+            if (types) {
+                if (types[0].typeName[0] === 'EventHandler') {
                     memberData.eventHandlers = memberData.eventHandlers || [];
                     memberData.eventHandlers.push(name);
                 } else {
