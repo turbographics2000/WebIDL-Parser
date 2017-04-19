@@ -125,7 +125,7 @@ function memberParse(groupElm, groupItemData, memberKind, callback) {
                     kindData.eventHandlers = kindData.eventHandlers || [];
                     kindData.eventHandlers.push(name);
                 } else {
-                    memberItemData.types = types;
+                    memberItemData.type = type;
                 }
             }
 
