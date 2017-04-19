@@ -133,7 +133,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
             if(types) memberItemData.types = types;
 
-            firstKeywordParse(elm, memberItemData);
+            headerKeywordsParse(elm, memberItemData);
             extAttrParse(elm, memberItemData);
 
             var params = paramParse(elm);
@@ -191,11 +191,14 @@ function getText(elm) {
     return (elm || nullObj).textContent.trim();
 }
 
-function firstKeywordParse(target, parseData) {
-    var firstWord = getText(target).split(' ')[0];
-    if (firstWord === 'readonly') parseData.readonly = true;
-    if (firstWord === 'optional') parseData.optional = true;
-    if (firstWord === 'required') parseData.required = true;
+function headerKeywordsParse(target, parseData) {
+    var keywords = getText(target).split(' ');
+    keywords.forEach(keyword => {
+        if(keyword === 'static') parseData.static = true;
+        if (keyword === 'readonly') parseData.readonly = true;
+        if (keyword === 'optional') parseData.optional = true;
+        if (keyword === 'required') parseData.required = true;
+    });
 }
 
 function paramParse(target) {
