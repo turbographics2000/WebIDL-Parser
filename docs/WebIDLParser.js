@@ -96,9 +96,9 @@ function WebIDLParse(doc) {
             memberParse(groupElm, groupItemData, 'Ctor');
             memberParse(groupElm, groupItemData, 'Attribute');
             memberParse(groupElm, groupItemData, 'Member');
-            memberParse(groupElm, groupItemData, 'EnumItem', (elm, txt, name, data) => {
-                data.items = data.items || [];
-                data.items.push(txt.replace(/"/g, ''));
+            memberParse(groupElm, groupItemData, 'EnumItem', (elm, data) => {
+                groupItemData.items = groupItemData.items || [];
+                groupItemData.items.push(getText(elm).replace(/"/g, ''));
             });
             memberParse(groupElm, groupItemData, 'Callback');
             memberParse(groupElm, groupItemData, 'Maplike');
@@ -113,34 +113,33 @@ function memberParse(groupElm, groupItemData, memberKind, callback) {
         var memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
         memberElms.forEach(elm => {
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
+            memberName = memberName || elm.textContent;
             var memberItemData = name ? memberData[memberName] : memberData;
+            if(callback) {
+                callback(elm, memberItemData);
+            } else {
+                firstKeywordParse(elm, memberItemData);
+                extAttrParse(elm, memberItemData);
 
-            firstKeywordParse(elm, memberItemData);
-
-            extAttrParse(elm, memberItemData);
-
-            var type = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
-            if (type) {
-                if (type.typeName[0] === 'EventHandler') {
-                    memberItemData.eventHandlers = kindData.eventHandlers || [];
-                    memberItemData.eventHandlers.push(name);
-                } else {
-                    memberItemData.type = type;
+                var type = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
+                if (type) {
+                    if (type.typeName[0] === 'EventHandler') {
+                        memberItemData.eventHandlers = kindData.eventHandlers || [];
+                        memberItemData.eventHandlers.push(name);
+                    } else {
+                        memberItemData.type = type;
+                    }
                 }
-            }
 
-            var params = paramParse(elm);
-            if (params) {
-                memberItemData.params = params;
-            }
+                var params = paramParse(elm);
+                if (params) {
+                    memberItemData.params = params;
+                }
 
-            var defaultValue = getText(elm.querySelector(`.idl${memberKind}Value`));
-            if (defaultValue) {
-                memberItemData.defaltValue = defaultValue;
-            }
-
-            if (callback) {
-                callback(elm, elm.textContent, name, memberItemData);
+                var defaultValue = getText(elm.querySelector(`.idl${memberKind}Value`));
+                if (defaultValue) {
+                    memberItemData.defaltValue = defaultValue;
+                }
             }
         });
     }
