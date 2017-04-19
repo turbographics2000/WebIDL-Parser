@@ -93,7 +93,7 @@ function WebIDLParse(doc) {
                 case 'Dictionary':
                 case 'Interface':
                     var superClasses = Array.from(groupElm.querySelectorAll('.idlSuperclass')).map(elm => elm.textContent.trim());
-                    if(superClasses.length) groupItemData.superClasses = superClasses;
+                    if (superClasses.length) groupItemData.superClasses = superClasses;
                     ['Ctor', 'Attribute', 'Member', 'Method'].forEach(memberKind => {
                         memberParse(groupElm, groupItemData, memberKind);
                     })
@@ -118,23 +118,21 @@ function memberParse(groupElm, groupItemData, memberKind) {
     var memberElms = groupElm.querySelectorAll(`.idl${memberKind}`);
     if (memberElms.length) {
         var memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
-        if(typeof memberData === 'string') debugger;
+        if (typeof memberData === 'string') debugger;
         memberElms.forEach(elm => {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
-            var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-
-            firstKeywordParse(elm, memberItemData);
-
-            extAttrParse(elm, memberItemData);
-
+            var memberItemData = null;
             var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
             if (types) {
                 if (types[0].typeNames[0] === 'EventHandler') {
                     memberData.eventHandlers = memberData.eventHandlers || [];
-                    memberData.eventHandlers.push(name);
+                    memberData.eventHandlers.push(memberName);
                 } else {
                     memberItemData.types = types;
+                    memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
+                    firstKeywordParse(elm, memberItemData);
+                    extAttrParse(elm, memberItemData);
                 }
             }
 
@@ -148,7 +146,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 memberItemData.defaltValue = defaultValue.replace(/"/g, '');
             }
 
-            if(memberKind === 'Superclass') {
+            if (memberKind === 'Superclass') {
                 memberData = getText(elm);
             }
         });
@@ -180,9 +178,9 @@ function extAttrParse(target, parseData) {
     extAttrElms.forEach(elm => {
         var extAttr = {};
         var name = getText(elm.querySelector('.extAttrName'));
-        if(name) extAttr.name = name;
+        if (name) extAttr.name = name;
         var rhs = getText(elm.querySelector('.extAttrRhs'));
-        if(rhs) extAttr.rhs = rhs; 
+        if (rhs) extAttr.rhs = rhs;
         extAttrs.push(extAttr);
     });
     if (extAttrs.length) parseData.extAttrs = extAttrs;
