@@ -123,16 +123,17 @@ function memberParse(groupElm, groupItemData, memberKind) {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
             var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
+            var memberItemData;
             if (types) {
                 if (types[0].typeNames[0] === 'EventHandler') {
                     memberData.eventHandlers = memberData.eventHandlers || [];
                     memberData.eventHandlers.push(memberName);
                     return;
                 }
+                memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
+                memberItemData.types = types;
             }
 
-            var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-            memberItemData.types = types;
             firstKeywordParse(elm, memberItemData);
             extAttrParse(elm, memberItemData);
 
