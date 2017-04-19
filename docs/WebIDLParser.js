@@ -101,7 +101,7 @@ function WebIDLParse(doc) {
                 case 'Callback':
                     memberParse(groupElm, groupItemData, 'Callback');
                     var cbParams = paramParse(groupElm);
-                    if(cbParams) groupItemData.params = cbParams;
+                    if (cbParams) groupItemData.params = cbParams;
                     break;
                 case 'Enum':
                     groupElm.querySelectorAll('.idlEnumItem').forEach(item => {
@@ -133,7 +133,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
 
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-            if(types) memberItemData.types = types;
+            if (types) memberItemData.types = types;
 
             headerKeywordsParse(elm, memberItemData);
             extAttrParse(elm, memberItemData);
@@ -196,9 +196,8 @@ function getText(elm) {
 function headerKeywordsParse(target, parseData) {
     var keywords = getText(target).split(' ');
     keywords.forEach(keyword => {
-        if(keyword === 'static') parseData.static = true;
+        if (keyword === 'static') parseData.static = true;
         if (keyword === 'readonly') parseData.readonly = true;
-        if (keyword === 'optional') parseData.optional = true;
         if (keyword === 'required') parseData.required = true;
     });
 }
@@ -207,10 +206,13 @@ function paramParse(target) {
     var params = null;
     target.querySelectorAll('.idlParam').forEach(param => {
         params = params || [];
+
         var prm = {
             name: getText(param.querySelector('.idlParamName')),
             type: typeParse(param.querySelector('.idlParamType'))
         };
+        var txt = getText(param);
+        if(txt.startsWith('optional ')) prm.optional = true;        
         var defaultValue = getText(param.querySelector('.idlMemberValue'));
         if (defaultValue) {
             if (prm.type[0].isPrimitive && prm.type[0].type !== 'string') {
