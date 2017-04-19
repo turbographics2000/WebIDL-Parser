@@ -177,16 +177,10 @@ function appendMessage(txt) {
 function extAttrParse(target, parseData) {
     var extAttrElms = target.querySelectorAll(':scope > .extAttr');
     var extAttrs = [];
-    extAttrs.forEach(elm => {
+    extAttrElms.forEach(elm => {
         var extAttr = {};
         extAttr.name = getText(elm.querySelector('extAttrName'));
         extAttr.rhs = getText(elm.querySelector('extAttrRhs'));
-        extAttrs.push(extAttr);
-    });
-    var extAttrNameElms = target.querySelectorAll(':scope > .extAttrName');
-    extAttrs.forEach(elm => {
-        var extAttr = {};
-        extAttr.name = elm.textContent;
         extAttrs.push(extAttr);
     });
     if (extAttrs.length) parseData.extAttrs = extAttrs;
