@@ -92,7 +92,7 @@ function WebIDLParse(doc) {
             switch (group) {
                 case 'Dictionary':
                 case 'Interface':
-                    ['Superclass', 'Ctor', 'Attribute', 'Member'].forEach(memberKind => {
+                    ['Superclass', 'Ctor', 'Attribute', 'Member', 'Method'].forEach(memberKind => {
                         memberParse(groupElm, groupItemData, memberKind);
                     })
                     break;
