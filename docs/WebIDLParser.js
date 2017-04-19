@@ -221,9 +221,8 @@ function typeParse(typeElm) {
     var type = {};
     var typeName = getText(typeElm);
     var res = /([a-z]+?)<(.+?)>/i.exec(typeName);
-    var type2Name;
     if(res) {
-        type[sres[1]] = true;
+        type[res[1]] = true;
         typeName = res[2];
     }
     var typeNames = [];
