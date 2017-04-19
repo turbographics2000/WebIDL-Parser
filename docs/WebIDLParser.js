@@ -119,7 +119,6 @@ function memberParse(groupElm, groupItemData, memberKind) {
         memberElms.forEach(elm => {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
-            memberName = memberName || getText(elm);
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
 
             firstKeywordParse(elm, memberItemData);
@@ -147,7 +146,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
 
             if(!Object.keys(memberItemData).length) {
-                memberData[memberName] = memberName;
+                memberData = getText(elm);
             }
         });
     }
