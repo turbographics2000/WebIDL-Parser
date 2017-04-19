@@ -96,7 +96,7 @@ function WebIDLParse(doc) {
             memberParse(groupElm, groupItemData, 'Ctor');
             memberParse(groupElm, groupItemData, 'Attribute');
             memberParse(groupElm, groupItemData, 'Member');
-            memberParse(groupElm, groupItemData, 'EnumItem', (elm, data) => {
+            memberParse(groupElm, groupItemData, 'EnumItem', elm => {
                 groupItemData.items = groupItemData.items || [];
                 groupItemData.items.push(getText(elm).replace(/"/g, ''));
             });
@@ -112,12 +112,12 @@ function memberParse(groupElm, groupItemData, memberKind, callback) {
     if (memberElms.length) {
         var memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
         memberElms.forEach(elm => {
-            var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
-            memberName = memberName || elm.textContent;
-            var memberItemData = name ? memberData[memberName] : memberData;
             if(callback) {
-                callback(elm, memberItemData);
+                callback(elm);
             } else {
+                var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
+                memberName = memberName || elm.textContent;
+                var memberItemData = name ? memberData[memberName] : memberData;
                 firstKeywordParse(elm, memberItemData);
                 extAttrParse(elm, memberItemData);
 
