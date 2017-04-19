@@ -119,9 +119,9 @@ function memberParse(groupElm, groupItemData, memberKind, callback) {
 
             extAttrParse(elm, memberItemData);
 
-            var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
+            var type = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
             if(types) {
-                if (types[0].type === 'EventHandler') {
+                if (type.typeName[0] === 'EventHandler') {
                     kindData.eventHandlers = kindData.eventHandlers || [];
                     kindData.eventHandlers.push(name);
                 } else {
@@ -226,7 +226,7 @@ function typeParse(typeElm) {
         typeName = res[2];
     }
     var typeNames = [];
-    typeName.replace(/\(|\)|\r|\n/g, '').split(' or ').map(x => typeNames.concat(x.split(',').map(y => y.trim())));
+    typeName.replace(/\(|\)|\r|\n/g, '').split(' or ').forEach(x => typeNames = typeNames.concat(x.split(',').map(y => y.trim())));
     type.typeName = typeNames;
     return type;
 }
