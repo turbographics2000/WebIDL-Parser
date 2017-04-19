@@ -216,7 +216,7 @@ function paramParse(target) {
             }
             prm.defaltValue = defaultValue;
         }
-        firstKeywordParse(param, prm);
+        headerKeywordsParse(param, prm);
         params.push(prm);
     });
     return params;
