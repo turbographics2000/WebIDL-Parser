@@ -96,50 +96,48 @@ function WebIDLParse(doc) {
             memberParse(groupElm, groupItemData, 'Ctor');
             memberParse(groupElm, groupItemData, 'Attribute');
             memberParse(groupElm, groupItemData, 'Member');
-            memberParse(groupElm, groupItemData, 'EnumItem', elm => {
-                groupItemData.items = groupItemData.items || [];
-                groupItemData.items.push(getText(elm).replace(/"/g, ''));
-            });
             memberParse(groupElm, groupItemData, 'Callback');
             memberParse(groupElm, groupItemData, 'Maplike');
+            groupElm.querySelectorAll('.idlEnumItem').forEach(item => {
+                groupItemData.items = groupItemData.items || [];
+                groupItemData.items.push(getText(item).replace(/"/g, ''));
+            });
         });
     });
     return parseData;
 }
 
-function memberParse(groupElm, groupItemData, memberKind, callback) {
+function memberParse(groupElm, groupItemData, memberKind) {
     var memberElms = groupElm.querySelectorAll(`.idl${memberKind}`);
     if (memberElms.length) {
         var memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
         memberElms.forEach(elm => {
-            if(callback) {
-                callback(elm);
-            } else {
-                var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
-                memberName = memberName || elm.textContent;
-                var memberItemData = name ? memberData[memberName] : memberData;
-                firstKeywordParse(elm, memberItemData);
-                extAttrParse(elm, memberItemData);
+            var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
+            memberName = memberName || elm.textContent;
+            var memberItemData = name ? memberData[memberName] : memberData;
 
-                var type = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
-                if (type) {
-                    if (type.typeName[0] === 'EventHandler') {
-                        memberItemData.eventHandlers = kindData.eventHandlers || [];
-                        memberItemData.eventHandlers.push(name);
-                    } else {
-                        memberItemData.type = type;
-                    }
-                }
+            firstKeywordParse(elm, memberItemData);
 
-                var params = paramParse(elm);
-                if (params) {
-                    memberItemData.params = params;
-                }
+            extAttrParse(elm, memberItemData);
 
-                var defaultValue = getText(elm.querySelector(`.idl${memberKind}Value`));
-                if (defaultValue) {
-                    memberItemData.defaltValue = defaultValue;
+            var type = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
+            if (type) {
+                if (type.typeName[0] === 'EventHandler') {
+                    memberItemData.eventHandlers = kindData.eventHandlers || [];
+                    memberItemData.eventHandlers.push(name);
+                } else {
+                    memberItemData.type = type;
                 }
+            }
+
+            var params = paramParse(elm);
+            if (params) {
+                memberItemData.params = params;
+            }
+
+            var defaultValue = getText(elm.querySelector(`.idl${memberKind}Value`));
+            if (defaultValue) {
+                memberItemData.defaltValue = defaultValue;
             }
         });
     }
