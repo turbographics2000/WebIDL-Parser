@@ -234,8 +234,7 @@ function typeParse(typeElm) {
             type[res[1]] = true;
             typeName = res[2];
         }
-        typeNames = typeNames.concat(x.split(',').map(y => y.trim()))
-        type.typeName = typeNames;
+        type.typeName = typeName.split(',').map(x => x.trim());
         types.push(type);
     });
     return types;
