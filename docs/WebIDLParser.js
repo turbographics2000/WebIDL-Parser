@@ -145,7 +145,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
 
             var defaultValue = getText(elm.querySelector(`.idl${memberKind}Value`));
             if (defaultValue) {
-                memberItemData.defaltValue = defaultValue;
+                memberItemData.defaltValue = defaultValue.replace('"', '');
             }
 
             if(memberKind === 'Superclass') {
