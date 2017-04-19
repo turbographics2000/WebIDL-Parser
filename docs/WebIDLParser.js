@@ -85,23 +85,28 @@ function WebIDLParse(doc) {
 
     groups.forEach(group => { // Dictionary, Interface, Enum, Callback ...
         var groupData = parseData[group] = parseData[group] || {};
-
         doc.querySelectorAll(`.idl${group}`).forEach(groupElm => {
             var id = getText(groupElm.querySelector(`.idl${group}ID`));
             var groupItemData = groupData[id] = groupData[id] || {};
-
             extAttrParse(groupElm, groupItemData);
-
-            memberParse(groupElm, groupItemData, 'Superclass');
-            memberParse(groupElm, groupItemData, 'Ctor');
-            memberParse(groupElm, groupItemData, 'Attribute');
-            memberParse(groupElm, groupItemData, 'Member');
-            memberParse(groupElm, groupItemData, 'Callback');
+            switch (group) {
+                case 'Dictionary':
+                case 'Interface':
+                    ['Superclass', 'Ctor', 'Attribute', 'Member'].forEach(memberKind => {
+                        memberParse(groupElm, groupItemData, memberKind);
+                    })
+                    break;
+                case 'Callback':
+                    memberParse(groupElm, groupItemData, 'Callback');
+                    break;
+                case 'Enum':
+                    groupElm.querySelectorAll('.idlEnumItem').forEach(item => {
+                        groupItemData.items = groupItemData.items || [];
+                        groupItemData.items.push(getText(item).replace(/"/g, ''));
+                    });
+                    break;
+            }
             memberParse(groupElm, groupItemData, 'Maplike');
-            groupElm.querySelectorAll('.idlEnumItem').forEach(item => {
-                groupItemData.items = groupItemData.items || [];
-                groupItemData.items.push(getText(item).replace(/"/g, ''));
-            });
         });
     });
     return parseData;
