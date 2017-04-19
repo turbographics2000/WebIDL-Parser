@@ -84,7 +84,7 @@ function WebIDLParse(doc) {
         .filter((val, idx, arr) => arr.indexOf(val) === idx);
 
     groups.forEach(group => { // Dictionary, Interface, Enum, Callback ...
-        var groupData = parseData[group] || {};
+        var groupData = parseData[group] = parseData[group] || {};
 
         doc.querySelectorAll(`.idl${group}`).forEach(groupElm => {
             var id = getText(groupElm.querySelector(`.idl${group}ID`));
@@ -122,8 +122,8 @@ function memberParse(groupElm, groupItemData, memberKind, callback) {
             var type = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
             if (type) {
                 if (type.typeName[0] === 'EventHandler') {
-                    kindData.eventHandlers = kindData.eventHandlers || [];
-                    kindData.eventHandlers.push(name);
+                    memberItemData.eventHandlers = kindData.eventHandlers || [];
+                    memberItemData.eventHandlers.push(name);
                 } else {
                     memberItemData.type = type;
                 }
