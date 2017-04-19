@@ -129,7 +129,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             var type = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
             if (type) {
                 if (type.typeName[0] === 'EventHandler') {
-                    memberItemData.eventHandlers = kindData.eventHandlers || [];
+                    memberItemData.eventHandlers = memberItemData.eventHandlers || [];
                     memberItemData.eventHandlers.push(name);
                 } else {
                     memberItemData.type = type;
