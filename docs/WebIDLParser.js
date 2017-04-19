@@ -228,7 +228,7 @@ function typeParse(typeElm) {
     var typeNames = [];
     typeName.replace(/\(|\)|\r|\n/g, '').split(' or ').map(x => typeNames.concat(x.split(',').map(y => y.trim())));
     type.typeName = typeNames;
-    return types;
+    return type;
 }
 
 
