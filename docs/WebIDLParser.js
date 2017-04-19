@@ -179,8 +179,10 @@ function extAttrParse(target, parseData) {
     var extAttrs = [];
     extAttrElms.forEach(elm => {
         var extAttr = {};
-        extAttr.name = getText(elm.querySelector('.extAttrName'));
-        extAttr.rhs = getText(elm.querySelector('.extAttrRhs'));
+        var name = getText(elm.querySelector('.extAttrName'));
+        if(name) extAttr.name = name;
+        var rhs = getText(elm.querySelector('.extAttrRhs'));
+        if(rhs) extAttr.rhs = rhs; 
         extAttrs.push(extAttr);
     });
     if (extAttrs.length) parseData.extAttrs = extAttrs;
