@@ -100,7 +100,8 @@ function WebIDLParse(doc) {
                     break;
                 case 'Callback':
                     memberParse(groupElm, groupItemData, 'Callback');
-                    paramParse(groupElm, groupData);
+                    var cbParams = paramParse(groupElm);
+                    if(cbParams) groupData.params = cbParams;
                     break;
                 case 'Enum':
                     groupElm.querySelectorAll('.idlEnumItem').forEach(item => {
