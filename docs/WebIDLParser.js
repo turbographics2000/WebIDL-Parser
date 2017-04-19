@@ -129,8 +129,8 @@ function memberParse(groupElm, groupItemData, memberKind) {
                     memberData.eventHandlers = memberData.eventHandlers || [];
                     memberData.eventHandlers.push(memberName);
                 } else {
-                    memberItemData.types = types;
                     memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
+                    memberItemData.types = types;
                     firstKeywordParse(elm, memberItemData);
                     extAttrParse(elm, memberItemData);
                 }
