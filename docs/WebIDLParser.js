@@ -147,7 +147,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
 
             if(!Object.keys(memberItemData).length) {
-                memberItemData.name = memberName;
+                memberItemData = memberName;
             }
         });
     }
