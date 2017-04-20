@@ -114,7 +114,10 @@ function WebIDLParse(doc, optimize) {
         });
     });
 
-    if(optimize) dataOptimize(parseData);
+    if(optimize) {
+        dataOptimize(parseData);
+        dataOptimize2(parseData);
+    }
     return parseData;
 }
 
@@ -251,11 +254,20 @@ function typeParse(typeElm) {
 
 function dataOptimize(data) {
     if(typeof data !== 'object') return;
-    debugger;
     Object.keys(data).forEach(key => {
         dataOptimize(data[key]);
         if(Array.isArray(data[key]) && data[key].length === 1) {
             data[key] = data[key][0];
+        }
+    });
+}
+
+function dataOptimize2(data) {
+    if(typeof data !== 'object') return;
+    Object.keys(data).forEach(key => {
+        var subKeys = Object.keys(data[key]);
+        if(subKeys.length === 1) {
+            data[key] = data[key][subKeys[0]];
         }
     });
 }
