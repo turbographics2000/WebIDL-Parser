@@ -76,7 +76,7 @@ parseData = {
 }
 */
 
-function WebIDLParse(doc) {
+function WebIDLParse(doc, optimize) {
     var parseData = {};
 
     var groups = Array.from(doc.querySelectorAll('.idl *[class$=ID]'))
@@ -101,7 +101,7 @@ function WebIDLParse(doc) {
                 case 'Callback':
                     memberParse(groupElm, groupItemData, 'Callback');
                     var cbParams = paramParse(groupElm);
-                    if (cbParams) groupItemData.params = cbParams;
+                    if (cbParams) groupItemData.param = cbParams;
                     break;
                 case 'Enum':
                     groupElm.querySelectorAll('.idlEnumItem').forEach(item => {
@@ -113,6 +113,8 @@ function WebIDLParse(doc) {
             memberParse(groupElm, groupItemData, 'Maplike');
         });
     });
+
+    if(optimize) dataOptimize(parseData);
     return parseData;
 }
 
@@ -127,20 +129,20 @@ function memberParse(groupElm, groupItemData, memberKind) {
 
             var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
             if (types && types[0].typeNames[0] === 'EventHandler') {
-                memberData.eventHandlers = memberData.eventHandlers || [];
-                memberData.eventHandlers.push(memberName);
+                memberData.eventHandler = memberData.eventHandler || [];
+                memberData.eventHandler.push(memberName);
                 return;
             }
 
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-            if (types) memberItemData.types = types;
+            if (types) memberItemData.type = types;
 
             headerKeywordsParse(elm, memberItemData);
             extAttrParse(elm, memberItemData);
 
             var params = paramParse(elm);
             if (params) {
-                memberItemData.params = params;
+                memberItemData.param = params;
             }
 
             var defaultValue = getText(elm.querySelector(`.idl${memberKind}Value`));
@@ -241,10 +243,18 @@ function typeParse(typeElm) {
             typeName = res[2];
         }
         var typeNames = typeName.split(',').map(x => x.trim());
-        type.typeNames = typeNames;
+        type.typeName = typeNames;
         types.push(type);
     });
     return types;
 }
 
+function dataOptimize(data) {
+    Object.keys(data).forEach(key => {
+        dataOptimize(data[key]);
+        if(Array.isArray(data[key]) && data[key].length === 1) {
+            data[key] = data[key][0];
+        }
+    });
+}
 
