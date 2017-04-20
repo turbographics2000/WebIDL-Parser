@@ -250,6 +250,7 @@ function typeParse(typeElm) {
 }
 
 function dataOptimize(data) {
+    debugger;
     Object.keys(data).forEach(key => {
         dataOptimize(data[key]);
         if(Array.isArray(data[key]) && data[key].length === 1) {
