@@ -265,6 +265,7 @@ function dataOptimize(data) {
 function dataOptimize2(data) {
     if(typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
+        dataOptimize2(data[key]);
         var subKeys = Object.keys(data[key]);
         if(subKeys.length === 1) {
             data[key] = data[key][subKeys[0]];
