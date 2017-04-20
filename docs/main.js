@@ -6,6 +6,6 @@ fetch('https://www.w3.org/TR/webrtc/')
         var legacySection = dom.getElementById('legacy-interface-extensions');
         legacySection.parentElement.removeChild(legacySection);
         console.clear();
-        console.log(JSON.stringify(WebIDLParse(dom, true), null, 4));
+        console.log(JSON.stringify(WebIDLParse(dom, false), null, 4));
     })
     .catch(ex => console.log('fetch error', ex));
