@@ -76,7 +76,7 @@ parseData = {
 }
 */
 
-function WebIDLParse(doc) {
+function WebIDLParse(doc, optimize) {
     var parseData = {};
 
     var groups = Array.from(doc.querySelectorAll('.idl *[class$=ID]'))
@@ -92,8 +92,8 @@ function WebIDLParse(doc) {
             switch (group) {
                 case 'Dictionary':
                 case 'Interface':
-                    var superClasses = Array.from(groupElm.querySelectorAll('.idlSuperclass')).map(elm => elm.textContent.trim());
-                    if (superClasses.length) groupItemData.superClasses = superClasses;
+                    var superClasse = Array.from(groupElm.querySelectorAll('.idlSuperclass')).map(elm => getText(elm));
+                    if (superClasse.length) groupItemData.superClasse = superClasse;
                     ['Ctor', 'Attribute', 'Member', 'Method'].forEach(memberKind => {
                         memberParse(groupElm, groupItemData, memberKind);
                     })
@@ -101,7 +101,13 @@ function WebIDLParse(doc) {
                 case 'Callback':
                     memberParse(groupElm, groupItemData, 'Callback');
                     var cbParams = paramParse(groupElm);
-                    if (cbParams) groupItemData.params = cbParams;
+                    if (cbParams) {
+                        if (cbParams.length === 1 && optimize) {
+                            groupItemData.params = cbParams[0];
+                        } else {
+                            groupItemData.params = cbParams;
+                        }
+                    }
                     break;
                 case 'Enum':
                     groupElm.querySelectorAll('.idlEnumItem').forEach(item => {
@@ -116,7 +122,7 @@ function WebIDLParse(doc) {
     return parseData;
 }
 
-function memberParse(groupElm, groupItemData, memberKind) {
+function memberParse(groupElm, groupItemData, memberKind, optimize) {
     var memberElms = groupElm.querySelectorAll(`.idl${memberKind}`);
     if (memberElms.length) {
         var memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
@@ -125,7 +131,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
 
-            var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
+            var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`), optimize);
             if (types && types[0].typeNames[0] === 'EventHandler') {
                 memberData.eventHandlers = memberData.eventHandlers || [];
                 memberData.eventHandlers.push(memberName);
@@ -133,14 +139,24 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
 
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-            if (types) memberItemData.types = types;
+            if (types) {
+                if (types.length === 1 && optimize) {
+                    memberItemData.type = types[0];
+                } else {
+                    memberItemData.type = types;
+                }
+            }
 
             headerKeywordsParse(elm, memberItemData);
             extAttrParse(elm, memberItemData);
 
             var params = paramParse(elm);
             if (params) {
-                memberItemData.params = params;
+                if (params.length === 1 && optimize) {
+                    memberItemData.param = params[0];
+                } else {
+                    memberItemData.param = params;
+                }
             }
 
             var defaultValue = getText(elm.querySelector(`.idl${memberKind}Value`));
@@ -174,7 +190,7 @@ function appendMessage(txt) {
     document.body.appendChild(div);
 }
 
-function extAttrParse(target, parseData) {
+function extAttrParse(target, parseData, optimize) {
     var extAttrElms = target.querySelectorAll(':scope > .extAttr');
     var extAttrs = [];
     extAttrElms.forEach(elm => {
@@ -185,7 +201,7 @@ function extAttrParse(target, parseData) {
         if (rhs) extAttr.rhs = rhs;
         extAttrs.push(extAttr);
     });
-    if (extAttrs.length) parseData.extAttrs = extAttrs;
+    if (extAttrs.length) parseData.extAttr = extAttrs;
 }
 
 var nullObj = { textContent: '' };
@@ -212,7 +228,7 @@ function paramParse(target) {
             type: typeParse(param.querySelector('.idlParamType'))
         };
         var txt = getText(param);
-        if(txt.startsWith('optional ')) prm.optional = true;        
+        if (txt.startsWith('optional ')) prm.optional = true;
         var defaultValue = getText(param.querySelector('.idlMemberValue'));
         if (defaultValue) {
             if (prm.type[0].isPrimitive && prm.type[0].type !== 'string') {
@@ -239,7 +255,7 @@ function typeParse(typeElm) {
             typeName = res[2];
         }
         var typeNames = typeName.split(',').map(x => x.trim());
-        type.typeNames = typeNames;
+        type.typeName = typeNames;
         types.push(type);
     });
     return types;
