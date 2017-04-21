@@ -148,7 +148,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
 
             var typeDec = /([a-z]+?)<(.+?)>/i.exec(getText(elm));
-            if(typeDec && !['frozenarray', 'sequence', 'optional'].includes(typeDec[1])) {
+            if(typeDec && !['frozenarray', 'sequence', 'optional'].includes(typeDec[1].toLowerCase())) {
                 memberData[typeDec[1]] = true;                
             }
             var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
@@ -259,7 +259,7 @@ function typeParse(typeElm) {
         var typeDec = /([a-z]+?)<(.+?)>/i.exec(typeName);
         var type = {};
         if (typeDec) {
-            if(['frozenarray', 'sequence', 'optional'].includes(res[1].toLowerCase())) {
+            if(['frozenarray', 'sequence', 'optional'].includes(typeDec[1].toLowerCase())) {
                 type[typeDec[1]] = true;
             }
             typeName = typeDec[2];
