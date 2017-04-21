@@ -147,10 +147,6 @@ function memberParse(groupElm, groupItemData, memberKind) {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
 
-            var typeDec = /([a-z]+?)<(.+?)>/i.exec(getText(elm));
-            if(typeDec && !['frozenarray', 'sequence', 'optional'].includes(typeDec[1].toLowerCase())) {
-                memberData[typeDec[1]] = true;                
-            }
             var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
             if (types && types[0].typeName[0] === 'EventHandler') {
                 memberData.eventHandler = memberData.eventHandler || [];
@@ -165,6 +161,10 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
             }
             if (types) memberItemData.type = types;
+            var typeDec = /([a-z]+?)<(.+?)>/i.exec(getText(elm));
+            if(typeDec && !['frozenarray', 'sequence', 'optional'].includes(typeDec[1].toLowerCase())) {
+                memberItemData[typeDec[1]] = true;                
+            }
 
             headerKeywordsParse(elm, memberItemData);
             extAttrParse(elm, memberItemData);
