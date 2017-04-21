@@ -137,8 +137,8 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
             if (elm.className === 'idlMaplike') {
                 types = typeParse(elm);
-                memberData.key = { type: [{ typeName: type[0].typeName[0] }] };
-                memberData.value = { type: [{ typeName: type[0].typeName[1] }] };
+                memberData.key = { type: [{ typeName: types[0].typeName[0] }] };
+                memberData.value = { type: [{ typeName: types[0].typeName[1] }] };
                 debugger;
                 return;
             }
