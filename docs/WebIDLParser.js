@@ -130,11 +130,15 @@ function memberParse(groupElm, groupItemData, memberKind) {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
 
-            var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type, .idlMaplike`));
+            var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
             if (types && types[0].typeName[0] === 'EventHandler') {
                 memberData.eventHandler = memberData.eventHandler || [];
                 memberData.eventHandler.push(memberName);
                 return;
+            }
+            if(elm.className === 'idlMaplike') {
+                debugger;
+                types = typeParse(elm);
             }
 
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
@@ -222,7 +226,6 @@ function paramParse(target) {
 
 function typeParse(typeElm) {
     if (!typeElm) return null;
-    if(typeElm.className === 'idlMaplike') debugger;
 
     var types = [];
     var txt = getText(typeElm);
