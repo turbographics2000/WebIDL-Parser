@@ -139,9 +139,9 @@ function memberParse(groupElm, groupItemData, memberKind) {
     if (memberElms.length) {
         var memberData = null;
         if(memberKind === 'Ctor') {
-            groupItemData[memberKind] = groupItemData[memberKind] || [];
+            memberData = groupItemData[memberKind] = groupItemData[memberKind] || [];
         } else {
-            groupItemData[memberKind] = groupItemData[memberKind] || {};
+            memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
         }
         memberElms.forEach(elm => {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
@@ -180,7 +180,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
 
             if(memberKind === 'Ctor') {
-                groupItemData[memberKind].push(memberItemData);
+                memberData.push(memberItemData);
             }
         });
     }
