@@ -94,7 +94,7 @@ function WebIDLParse(doc, optimize) {
                 case 'Interface':
                     var superClasses = Array.from(groupElm.querySelectorAll('.idlSuperclass')).map(elm => elm.textContent.trim());
                     if (superClasses.length) groupItemData.superClasses = superClasses;
-                    ['Ctor', 'Attribute', 'Member', 'Method'].forEach(memberKind => {
+                    ['Ctor', 'Attribute', 'Member', 'Method', 'Maplike'].forEach(memberKind => {
                         memberParse(groupElm, groupItemData, memberKind);
                     })
                     break;
@@ -110,7 +110,6 @@ function WebIDLParse(doc, optimize) {
                     });
                     break;
             }
-            memberParse(groupElm, parseData, 'Maplike');
         });
     });
 
@@ -137,7 +136,6 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 return;
             }
             if(elm.className === 'idlMaplike') {
-                debugger;
             } 
 
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
