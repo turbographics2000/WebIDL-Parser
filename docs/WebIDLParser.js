@@ -123,6 +123,13 @@ function WebIDLParse(doc, optimize) {
 function memberParse(groupElm, groupItemData, memberKind) {
     var memberElms = groupElm.querySelectorAll(`.idl${memberKind}`);
     if (memberElms.length) {
+        if(memberKind === 'Maplike') {
+            types = typeParse(elm);
+            groupItemData.key = { type: [{ typeName: types[0].typeName[0] }] };
+            groupItemData.value = { type: [{ typeName: types[0].typeName[1] }] };
+            debugger;
+            return;
+        }
         var memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
         if (typeof memberData === 'string') debugger;
         memberElms.forEach(elm => {
@@ -133,13 +140,6 @@ function memberParse(groupElm, groupItemData, memberKind) {
             if (types && types[0].typeName[0] === 'EventHandler') {
                 memberData.eventHandler = memberData.eventHandler || [];
                 memberData.eventHandler.push(memberName);
-                return;
-            }
-            if (elm.className === 'idlMaplike') {
-                types = typeParse(elm);
-                memberData.key = { type: [{ typeName: types[0].typeName[0] }] };
-                memberData.value = { type: [{ typeName: types[0].typeName[1] }] };
-                debugger;
                 return;
             }
 
