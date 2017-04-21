@@ -100,7 +100,6 @@ function WebIDLParse(doc, optimize) {
                         type: [{ typeName: types[0].typeName[1] }]
                     }
                 };
-                debugger;
                 return;
             }
             switch (group) {
@@ -259,13 +258,24 @@ function typeParse(typeElm) {
         var typeDec = /([a-z]+?)<(.+?)>/i.exec(typeName);
         var type = {};
         if (typeDec) {
-            if(['frozenarray', 'record', 'sequence'].includes(typeDec[1].toLowerCase())) {
+            typeDecs = ['frozenarray', 'record', 'sequence'];
+            if(typeElm.className !== 'idlMethType') typeDecs.push('promise');
+            if(typeDecs.includes(typeDec[1].toLowerCase())) {
                 type[typeDec[1]] = true;
             }
             typeName = typeDec[2];
         }
         var typeNames = typeName.split(',').map(x => x.trim());
-        type.typeName = typeNames.length > 1 ? typeNames : typeNames[0];
+        if(type.record) {
+            type.key = {
+                typeName: typeNames[0]
+            };
+            type.value = {
+                typeName: typeNames[1]
+            };
+        } else {
+            type.typeName = typeNames.length > 1 ? typeNames : typeNames[0];
+        }
         types.push(type);
     });
     return types;
