@@ -94,7 +94,7 @@ function WebIDLParse(doc, optimize) {
                 case 'Interface':
                     var superClasses = Array.from(groupElm.querySelectorAll('.idlSuperclass')).map(elm => elm.textContent.trim());
                     if (superClasses.length) groupItemData.superClasses = superClasses;
-                    ['Ctor', 'Attribute', 'Member', 'Method', 'Maplike'].forEach(memberKind => {
+                    ['Ctor', 'Attribute', 'Member', 'Method'].forEach(memberKind => {
                         memberParse(groupElm, groupItemData, memberKind);
                     })
                     break;
@@ -110,6 +110,14 @@ function WebIDLParse(doc, optimize) {
                     });
                     break;
             }
+            if (memberKind === 'Maplike') {
+                var types = typeParse(groupElm);
+                parseData.Maplike = parseData.Maplike || {};
+                parseData.Maplike[id].key = { type: [{ typeName: types[0].typeName[0] }] };
+                parseData.Maplike[id].value = { type: [{ typeName: types[0].typeName[1] }] };
+                debugger;
+                return;
+            }
         });
     });
 
@@ -123,13 +131,6 @@ function WebIDLParse(doc, optimize) {
 function memberParse(groupElm, groupItemData, memberKind) {
     var memberElms = groupElm.querySelectorAll(`.idl${memberKind}`);
     if (memberElms.length) {
-        if(memberKind === 'Maplike') {
-            types = typeParse(groupElm);
-            groupItemData.key = { type: [{ typeName: types[0].typeName[0] }] };
-            groupItemData.value = { type: [{ typeName: types[0].typeName[1] }] };
-            debugger;
-            return;
-        }
         var memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
         if (typeof memberData === 'string') debugger;
         memberElms.forEach(elm => {
