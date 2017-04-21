@@ -107,7 +107,7 @@ function WebIDLParse(doc, optimize) {
                 case 'Dictionary':
                 case 'Interface':
                     var superclass = getText(groupElm.querySelector('.idlSuperclass'));
-                    if(superclass) groupItemData.superclass = superclass;
+                    if(superclass) groupItemData.Superclass = superclass;
                     ['Ctor', 'Attribute', 'Member', 'Method'].forEach(memberKind => {
                         memberParse(groupElm, groupItemData, memberKind);
                     })
@@ -147,6 +147,10 @@ function memberParse(groupElm, groupItemData, memberKind) {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
 
+            var typeDec = /([a-z]+?)<(.+?)>/i.exec(getText(elm));
+            if(typeDec && !['frozenarray', 'sequence', 'optional'].includes(typeDec[1])) {
+                memberData[typeDec[1]] = true;                
+            }
             var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
             if (types && types[0].typeName[0] === 'EventHandler') {
                 memberData.eventHandler = memberData.eventHandler || [];
@@ -252,11 +256,13 @@ function typeParse(typeElm) {
     var types = [];
     var txt = getText(typeElm);
     txt.replace(/\(|\)|\r|\n/g, '').split(' or ').forEach(typeName => {
-        var res = /([a-z]+?)<(.+?)>/i.exec(typeName);
+        var typeDec = /([a-z]+?)<(.+?)>/i.exec(typeName);
         var type = {};
-        if (res) {
-            type[res[1]] = true;
-            typeName = res[2];
+        if (typeDec) {
+            if(['frozenarray', 'sequence', 'optional'].includes(res[1].toLowerCase())) {
+                type[typeDec[1]] = true;
+            }
+            typeName = typeDec[2];
         }
         var typeNames = typeName.split(',').map(x => x.trim());
         type.typeName = typeNames.length > 1 ? typeNames : typeNames[0];
