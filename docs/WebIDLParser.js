@@ -221,6 +221,7 @@ function paramParse(target) {
 }
 
 function typeParse(typeElm) {
+    if(typeElm.className === 'idlMaplike') debugger;
     if (!typeElm) return null;
 
     var types = [];
