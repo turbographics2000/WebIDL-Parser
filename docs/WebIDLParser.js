@@ -237,7 +237,7 @@ function typeParse(typeElm) {
             typeName = res[2];
         }
         var typeNames = typeName.split(',').map(x => x.trim());
-        type.typeName = typeNames;
+        type.typeName = typeNames.length > 1 ? typeNames : typeNames[0];
         types.push(type);
     });
     return types;
