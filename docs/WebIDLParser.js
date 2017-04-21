@@ -89,11 +89,25 @@ function WebIDLParse(doc, optimize) {
             var id = getText(groupElm.querySelector(`.idl${group}ID`));
             var groupItemData = groupData[id] = groupData[id] || {};
             extAttrParse(groupElm, groupItemData);
+            var types = typeParse(groupElm.querySelector('.idlMaplike'));
+            if (types) {
+                parseData.Maplike = parseData.Maplike || {};
+                parseData.Maplike[id] = {
+                    key: {
+                        type: [{ typeName: types[0].typeName[0] }]
+                    },
+                    value: {
+                        type: [{ typeName: types[0].typeName[1] }]
+                    }
+                };
+                debugger;
+                return;
+            }
             switch (group) {
                 case 'Dictionary':
                 case 'Interface':
-                    var superClasses = Array.from(groupElm.querySelectorAll('.idlSuperclass')).map(elm => elm.textContent.trim());
-                    if (superClasses.length) groupItemData.superClasses = superClasses;
+                    var superClasse = getText(groupElm.querySelector('.idlSuperclass'));
+                    if (superClasses.length) groupItemData.superClasse = superClasse;
                     ['Ctor', 'Attribute', 'Member', 'Method'].forEach(memberKind => {
                         memberParse(groupElm, groupItemData, memberKind);
                     })
@@ -110,20 +124,6 @@ function WebIDLParse(doc, optimize) {
                     });
                     break;
             }
-            var types = typeParse(groupElm.querySelector('.idlMaplike'));
-            if(types) {
-                parseData.Maplike = parseData.Maplike || {};
-                parseData.Maplike[id] = {
-                    key: { 
-                        type: [{ typeName: types[0].typeName[0] }] 
-                    },
-                    value: {
-                        type: [{ typeName: types[0].typeName[1] }]
-                    }
-                };
-                debugger;
-                return;
-            }
         });
     });
 
@@ -137,8 +137,12 @@ function WebIDLParse(doc, optimize) {
 function memberParse(groupElm, groupItemData, memberKind) {
     var memberElms = groupElm.querySelectorAll(`.idl${memberKind}`);
     if (memberElms.length) {
-        var memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
-        if (typeof memberData === 'string') debugger;
+        var memberData = null;
+        if(memberKind === 'Ctor') {
+            groupItemData[memberKind] = groupItemData[memberKind] || [];
+        } else {
+            groupItemData[memberKind] = groupItemData[memberKind] || {};
+        }
         memberElms.forEach(elm => {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
@@ -150,7 +154,12 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 return;
             }
 
-            var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
+            var memberItemData = null;
+            if(memberKind === 'Ctor') {
+                memberItemData = {};
+            } else {
+                memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
+            }
             if (types) memberItemData.type = types;
 
             headerKeywordsParse(elm, memberItemData);
@@ -168,6 +177,10 @@ function memberParse(groupElm, groupItemData, memberKind) {
 
             if (memberKind === 'Superclass') {
                 memberData = getText(elm);
+            }
+
+            if(memberKind === 'Ctor') {
+                groupItemData[memberKind].push(memberItemData);
             }
         });
     }
