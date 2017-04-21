@@ -137,8 +137,9 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 return;
             }
             if(elm.className === 'idlMaplike') {
-                debugger;
                 types = typeParse(elm);
+                memberData.maplike = memberData.maplike || [];
+                memberData.maplike.push(types[0]);
             }
 
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
