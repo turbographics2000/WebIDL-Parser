@@ -124,7 +124,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
     var memberElms = groupElm.querySelectorAll(`.idl${memberKind}`);
     if (memberElms.length) {
         if(memberKind === 'Maplike') {
-            types = typeParse(elm);
+            types = typeParse(groupElm);
             groupItemData.key = { type: [{ typeName: types[0].typeName[0] }] };
             groupItemData.value = { type: [{ typeName: types[0].typeName[1] }] };
             debugger;
