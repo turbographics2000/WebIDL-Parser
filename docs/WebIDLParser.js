@@ -162,7 +162,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
             if (types) memberItemData.type = types;
             var typeDec = /([a-z]+?)<(.+?)>/i.exec(getText(elm));
-            if(typeDec && !['frozenarray', 'sequence', 'optional'].includes(typeDec[1].toLowerCase())) {
+            if(typeDec && !['frozenarray', 'record', 'sequence'].includes(typeDec[1].toLowerCase())) {
                 memberItemData[typeDec[1]] = true;                
             }
 
@@ -259,7 +259,7 @@ function typeParse(typeElm) {
         var typeDec = /([a-z]+?)<(.+?)>/i.exec(typeName);
         var type = {};
         if (typeDec) {
-            if(['frozenarray', 'sequence', 'optional'].includes(typeDec[1].toLowerCase())) {
+            if(['frozenarray', 'record', 'sequence'].includes(typeDec[1].toLowerCase())) {
                 type[typeDec[1]] = true;
             }
             typeName = typeDec[2];
