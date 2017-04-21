@@ -130,7 +130,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
 
-            var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type`));
+            var types = typeParse(elm.querySelector(`.idlType, .idl${memberKind}Type, .idlMaplike`));
             if (types && types[0].typeName[0] === 'EventHandler') {
                 memberData.eventHandler = memberData.eventHandler || [];
                 memberData.eventHandler.push(memberName);
@@ -157,19 +157,6 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 memberData = getText(elm);
             }
         });
-    }
-}
-
-function generateParamPattern(idx, ptn, src, result) {
-    if (src.length === 0) return [];
-    for (var i = 0; i < src[idx].type.length; i++) {
-        var p = [].concat(ptn);
-        p.push(src[idx].type[i]);
-        if (idx < src.length - 1) {
-            generateParamPattern(idx + 1, p, src, result);
-        } else {
-            result.push(p);
-        }
     }
 }
 
