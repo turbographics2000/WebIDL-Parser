@@ -110,7 +110,12 @@ function WebIDLParse(doc, optimize) {
                     });
                     break;
             }
-            memberParse(groupElm, parseData, 'Maplike');
+            var maplike = groupElm.querySelectorAll('.idlMaplike');
+            maplike.forEach(ml => {
+                var type = typeParse(ml);
+                groupData.maplike = groupData.maplike || {};
+                groupData.maplike[id] = type;
+            });
         });
     });
 
@@ -134,12 +139,6 @@ function memberParse(groupElm, groupItemData, memberKind) {
             if (types && types[0].typeName[0] === 'EventHandler') {
                 memberData.eventHandler = memberData.eventHandler || [];
                 memberData.eventHandler.push(memberName);
-                return;
-            }
-            if(elm.className === 'idlMaplike') {
-                types = typeParse(elm);
-                groupElm.maplike = memberData.maplike || [];
-                memberData.maplike.push(types[0]);
                 return;
             }
 
