@@ -110,8 +110,8 @@ function WebIDLParse(doc, optimize) {
                     });
                     break;
             }
-            if (memberKind === 'Maplike') {
-                var types = typeParse(groupElm.querySelector('.idlMaplike'));
+            var types = typeParse(groupElm.querySelector('.idlMaplike'));
+            if(types) {
                 parseData.Maplike = parseData.Maplike || {};
                 parseData.Maplike[id].key = { type: [{ typeName: types[0].typeName[0] }] };
                 parseData.Maplike[id].value = { type: [{ typeName: types[0].typeName[1] }] };
