@@ -113,7 +113,7 @@ function WebIDLParse(doc, optimize) {
         });
     });
 
-    if(optimize) {
+    if (optimize) {
         dataOptimize(parseData);
         dataOptimize2(parseData);
     }
@@ -135,10 +135,13 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 memberData.eventHandler.push(memberName);
                 return;
             }
-            if(elm.className === 'idlMaplike') {
-                types = typeParse(elm);
+            if (elm.className === 'idlMaplike') {
+                type = typeParse(elm);
+                memberData.key = { type: [{ typeName: type.typeName[0] }] };
+                memberData.value = { type: [{ typeName: type.typeName[1] }] };
                 debugger;
-            } 
+                return;
+            }
 
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
             if (types) memberItemData.type = types;
@@ -207,7 +210,7 @@ function paramParse(target) {
             type: typeParse(param.querySelector('.idlParamType'))
         };
         var txt = getText(param);
-        if(txt.startsWith('optional ')) {
+        if (txt.startsWith('optional ')) {
             prm.optional = true;
         }
         var defaultValue = getText(param.querySelector('.idlMemberValue'));
@@ -243,21 +246,21 @@ function typeParse(typeElm) {
 }
 
 function dataOptimize(data) {
-    if(typeof data !== 'object') return;
+    if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize(data[key]);
-        if(Array.isArray(data[key]) && data[key].length === 1) {
+        if (Array.isArray(data[key]) && data[key].length === 1) {
             data[key] = data[key][0];
         }
     });
 }
 
 function dataOptimize2(data) {
-    if(typeof data !== 'object') return;
+    if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize2(data[key]);
         var subKeys = Object.keys(data[key]);
-        if(subKeys.length === 1) {
+        if (subKeys.length === 1) {
             data[key] = data[key][subKeys[0]];
         }
     });
