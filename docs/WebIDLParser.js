@@ -110,12 +110,7 @@ function WebIDLParse(doc, optimize) {
                     });
                     break;
             }
-            var maplike = groupElm.querySelectorAll('.idlMaplike');
-            maplike.forEach(ml => {
-                var type = typeParse(ml);
-                groupData.maplike = groupData.maplike || {};
-                groupData.maplike[id] = type;
-            });
+            memberParse(groupElm, parseData, 'Maplike');
         });
     });
 
@@ -141,6 +136,9 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 memberData.eventHandler.push(memberName);
                 return;
             }
+            if(elm.className === 'idlMaplike') {
+                debugger;
+            } 
 
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
             if (types) memberItemData.type = types;
