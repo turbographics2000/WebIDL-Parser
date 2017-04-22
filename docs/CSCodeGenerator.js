@@ -435,3 +435,34 @@ function generateCS(parseData, classStructs, arrayToList) {
             a.click();
         });
 }
+
+function convertToCSType(data, type) {
+
+}
+
+function generateParamPattern(data, params) {
+    params.forEach(param => {
+        convertToCSData(param, param.type);
+    });
+}
+
+function convertToCSData(data) {
+    if(typeof data !== object) return;
+    Object.keys(data).forEach(key => {
+        switch(key) {
+            case 'param':
+                generateParamPattern(data, data[key]);
+                break;
+            case 'type':
+                convertToCSType(data, data[key]);
+                break;
+        }
+        if(key === 'type') {
+            var csType = {};
+            if(type.sequence) {
+                csType.array = true;
+                //csType.isPrimitive = 
+            }
+        }
+    })
+}
