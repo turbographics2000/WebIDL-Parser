@@ -59,7 +59,7 @@ function generateParamPattern(data, params) {
 }
 
 function convertToCSData(data) {
-    if(typeof data !== object) return;
+    if(typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         switch(key) {
             case 'param':
