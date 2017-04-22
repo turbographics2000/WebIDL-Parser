@@ -43,7 +43,7 @@ var primitiveTypes = [
 
 function convertToCSType(data, types) {
     var csTypes = [];
-    if(!types.forEach) debugger;
+    if(!types.forEach) return;
     types.forEach(type => {
         var csType = {};
         csType.typeName = csTypeNames[type.typeName] || type.typeName;
