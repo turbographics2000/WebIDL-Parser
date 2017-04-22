@@ -206,7 +206,7 @@ function extAttrParse(target, parseData) {
         if (rhs) extAttr.extAttrRhs = rhs;
         extAttrs.push(extAttr);
     });
-    if (extAttrs.length) parseData.extAttrs = extAttrs;
+    if (extAttrs.length) parseData.extAttr = extAttrs;
 }
 
 var nullObj = { textContent: '' };
