@@ -69,6 +69,9 @@ function convertToCSData(data) {
             case 'type':
                 convertToCSType(data, data[key]);
                 break;
+            default:
+                convertToCSData(data[key]);
+                break;
         }
     });
 }
