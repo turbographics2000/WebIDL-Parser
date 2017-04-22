@@ -41,14 +41,18 @@ var primitiveTypes = [
     'string'
 ];
 
-function convertToCSType(data, type) {
-    var csType = {};
-    csType.typeName = csTypeNames[type.typeName] || type.typeName;
-    if(type.sequence) csType.array = true;
-    csType.primitive = primitiveTypes[csType.typeName];
-    if(csType.typeName === 'string' && csType.array) csType.primitive = false; 
-    csType.proxyType = csType.primitive ? csType.typeName : 'string';
-    data.csType = csType;
+function convertToCSType(data, types) {
+    var csTypes = [];
+    types.forEach(type => {
+        var csType = {};
+        csType.typeName = csTypeNames[type.typeName] || type.typeName;
+        if(type.sequence) csType.array = true;
+        csType.primitive = primitiveTypes[csType.typeName];
+        if(csType.typeName === 'string' && csType.array) csType.primitive = false; 
+        csType.proxyType = csType.primitive ? csType.typeName : 'string';
+        csTypes.push(csType);
+    });
+    data.csType = csTypes;
 }
 
 function generateParamPattern(data, params) {
