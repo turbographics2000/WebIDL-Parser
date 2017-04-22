@@ -11,7 +11,7 @@ var parseData = WebIDLParse(dom, false);
 ```
 
 
-## 解析結果データ構造
+## 解析結果データ構造(最適化なしの構造)
 WebRTCのドラフト仕様ページでは、実際には
 * Callback
 * Dictionary
