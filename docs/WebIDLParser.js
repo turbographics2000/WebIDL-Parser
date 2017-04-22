@@ -276,8 +276,8 @@ function typeParse(typeElm) {
                 typeName: typeNames[1]
             };
         } else {
-            //type.typeName = typeNames.length > 1 ? typeNames : typeNames[0];
-            type.typeName = typeNames;
+            type.typeName = typeNames.length > 1 ? typeNames : typeNames[0];
+            //type.typeName = typeNames;
         }
         types.push(type);
     });
