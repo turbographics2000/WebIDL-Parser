@@ -89,19 +89,19 @@ function WebIDLParse(doc, optimize) {
             var id = getText(groupElm.querySelector(`.idl${group}ID`));
             var groupItemData = groupData[id] = groupData[id] || {};
             extAttrParse(groupElm, groupItemData);
-            // var types = typeParse(groupElm.querySelector('.idlMaplike'));
-            // if (types) {
-            //     parseData.Maplike = parseData.Maplike || {};
-            //     parseData.Maplike[id] = {
-            //         key: {
-            //             type: [{ typeName: types[0].typeName[0] }]
-            //         },
-            //         value: {
-            //             type: [{ typeName: types[0].typeName[1] }]
-            //         }
-            //     };
-            //     return;
-            // }
+            var types = typeParse(groupElm.querySelector('.idlMaplike'));
+            if (types) {
+                parseData.Maplike = parseData.Maplike || {};
+                parseData.Maplike[id] = {
+                    key: {
+                        type: [{ typeName: types[0].typeName[0] }]
+                    },
+                    value: {
+                        type: [{ typeName: types[0].typeName[1] }]
+                    }
+                };
+                return;
+            }
             switch (group) {
                 case 'Dictionary':
                 case 'Interface':
@@ -164,7 +164,6 @@ function memberParse(groupElm, groupItemData, memberKind) {
             var typeDecs = ['frozenarray', 'record', 'sequence'];
             if(elm.className === 'idlAttribute') typeDecs.push('promise');
             if(typeDec && !typeDecs.includes(typeDec[1].toLowerCase())) {
-                console.log(typeDec[1]);
                 memberItemData[typeDec[1]] = true;                
             }
 
@@ -278,7 +277,6 @@ function typeParse(typeElm) {
             };
         } else {
             type.typeName = typeNames.length > 1 ? typeNames : typeNames[0];
-            //type.typeName = typeNames;
         }
         types.push(type);
     });

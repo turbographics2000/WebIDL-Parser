@@ -136,7 +136,7 @@ function saveCSManagerCode(fileName) {
     csManagerIndentLevel = 0;
 }
 
-function generateCS(classStructs, arrayToList) {
+function generateCS(parseData, classStructs, arrayToList) {
     var attrOrMemberAddCSLine = (name, data) => {
         var camName = camelize(name, true);
         var t = data.type[0];
@@ -317,13 +317,13 @@ function generateCS(classStructs, arrayToList) {
 
     zip = new JSZip();
     saveIdlCode('WebIDL.txt', 'WebIDLEnum.txt');
-    Object.keys(classStructs).forEach(kind => {
-        var rtcObj = classStructs[kind];
-        switch (kind) {
-            case 'dictionary':
-            case 'interface':
-                Object.keys(rtcObj).forEach(id => {
-                    var data = rtcObj[id];
+    Object.keys(parseData).forEach(group => {
+        var groupData = parseData[group];
+        switch (group) {
+            case 'Dictionary':
+            case 'Interface':
+                Object.keys(groupData).forEach(id => {
+                    var data = groupData[id];
                     addCSLine('using AOT;');
                     addCSLine('using RSG;');
                     addCSLine('using System;');
@@ -334,7 +334,7 @@ function generateCS(classStructs, arrayToList) {
                     addCSLine(`namespace ${managerNameSpace}`);
                     addCSLine('{');
 
-                    addCSLine(`public class ${id}${(data.superClassName ? ' : ' + data.superClassName : '')}`);
+                    addCSLine(`public class ${id}${(data.superClasses ? ' : ' + data.superClasse.join(', ') : '')}`);
                     addCSLine('{');
                     addCSLine(`public static Dictionary<string, ${id}> Instances; `);
                     addCSLine('public string InstanceId;');
@@ -402,7 +402,7 @@ function generateCS(classStructs, arrayToList) {
                     }
                 });
                 break;
-            case 'enum':
+            case 'Enum':
                 addCSLine('using System;');
                 addCSLine('using System.Collections.Generic;');
                 addCSLine('using System.Linq;');
@@ -422,7 +422,7 @@ function generateCS(classStructs, arrayToList) {
                 addCSLine(`}`);
                 saveCSCode(`${managerNameSpace}_Enums.cs`);
                 break;
-            case 'callback':
+            case 'Callback':
                 break;
         }
     });
