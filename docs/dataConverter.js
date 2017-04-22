@@ -49,7 +49,6 @@ function convertToCSType(data, type) {
     if(csType.typeName === 'string' && csType.array) csType.primitive = false; 
     csType.proxyType = csType.primitive ? csType.typeName : 'string';
     delete data.type;
-    debugger;
     data.csType = csType;
 }
 
