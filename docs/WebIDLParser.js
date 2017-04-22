@@ -201,9 +201,9 @@ function extAttrParse(target, parseData) {
     extAttrElms.forEach(elm => {
         var extAttr = {};
         var name = getText(elm.querySelector('.extAttrName'));
-        if (name) extAttr.name = name;
+        if (name) extAttr.extAttrName = name;
         var rhs = getText(elm.querySelector('.extAttrRhs'));
-        if (rhs) extAttr.rhs = rhs;
+        if (rhs) extAttr.extAttrRhs = rhs;
         extAttrs.push(extAttr);
     });
     if (extAttrs.length) parseData.extAttrs = extAttrs;
@@ -229,7 +229,7 @@ function paramParse(target) {
         params = params || [];
 
         var prm = {
-            name: getText(param.querySelector('.idlParamName')),
+            paramName: getText(param.querySelector('.idlParamName')),
             type: typeParse(param.querySelector('.idlParamType'))
         };
         var txt = getText(param);
@@ -239,9 +239,9 @@ function paramParse(target) {
         var defaultValue = getText(param.querySelector('.idlMemberValue'));
         if (defaultValue) {
             if (prm.type[0].isPrimitive && prm.type[0].type !== 'string') {
-                defaltValue = +defaultValue;
+                defaultValue = +defaultValue;
             }
-            prm.defaltValue = defaultValue;
+            prm.defaultValue = defaultValue;
         }
         headerKeywordsParse(param, prm);
         params.push(prm);
