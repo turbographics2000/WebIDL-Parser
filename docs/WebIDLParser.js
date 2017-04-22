@@ -100,6 +100,7 @@ function WebIDLParse(doc, optimize) {
                         type: [{ typeName: types[0].typeName[1] }]
                     }
                 };
+                if(types[0].readonly) parseData.Maplike[id].readonly = true;
                 return;
             }
             switch (group) {
