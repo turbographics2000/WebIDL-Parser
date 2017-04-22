@@ -48,7 +48,7 @@ WebRTCのドラフト仕様ページでは、実際には
 }
 ```
 
-## "type"キー、"typeName"キー、"FrozenArray"キー、"record"キー、"sequence"キー(、"Promise"キー)
+### "type"キー、"typeName"キー、"FrozenArray"キー、"record"キー、"sequence"キー(、"Promise"キー)
 WebIDLのデータ型には、byteやunsined long, float, stringといった基本的な型やクラスなどがある。
 解析データには"type"というキーで型情報を出力する。
 例えば、RTCPeerConnectionのaddTransceiver()の第一引数は、(MediaStreamTrack or DOMString)と複数の型を渡すことができる。
@@ -79,7 +79,7 @@ RTCPeerConnectionのpeerIdentityは、WebIDLにおいてはメソッドではな
 }
 ```
 
-## "extAttr"キー、"extAttrName"キー、"extAttrRhs"キー
+### "extAttr"キー、"extAttrName"キー、"extAttrRhs"キー
 属性は、DictionaryやInterface自体やDictionaryやInterfaceの各メンバーなどに設定される。
 属性がある場合は、それぞれのキーの配下に"extAttr"キーとして出力される。複数の属性がある場合が考えられるため値は配列となる。
 DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラクターも属性に含まれるのだが、
@@ -102,7 +102,7 @@ DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラ�
 }
 ```
 
-## "param"キー、"paramName"キー、"optional"キー
+### "param"キー、"paramName"キー、"optional"キー
 コンストラクターやメソッド、コールバックのパラメーター(引数)がこのキーに出力される。
 引数の順番が重要となるため値は配列となり、配列の要素は"paramName"キー(引数名)と"type"キーを持つオブジェクトになる。
 また、optional引数には、解析データに"optional"キー(値はturu)が追加される。
@@ -127,7 +127,7 @@ DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラ�
 }
 ```
 
-## "Callback"キー
+### "Callback"キー
 WebRTCのドラフト仕様ページで定義されているコールバックは、コールバックで渡される引数を定義したものとなっている。
 解析データでは"Callback"というキーの配下にまとめられて出力される。
 引数の情報は"param"というキーに順番も重要になるため配列で出力される。
@@ -152,7 +152,7 @@ WebRTCのドラフト仕様ページで定義されているコールバック�
 }
 ```
 
-## "Enum"キー
+### "Enum"キー
 列挙型はEnumキーの配下にまとめられ、名前をキーとして出力される。
 列挙型の各値は、"items"キーに配列として出力される。
 
@@ -171,7 +171,7 @@ WebRTCのドラフト仕様ページで定義されているコールバック�
 }
 ```
 
-## "Maplike"キー
+### "Maplike"キー
 WebRTCのドラフト仕様ページでMaplikeが使用されているのは、現時点でRTCStatsReportのみである。
 RTCStatsReportはInterfaceだが、Maplikeという特殊な型で定義されているため、Maplikeキーを設けて出力する。
 
@@ -199,7 +199,7 @@ RTCStatsReportはInterfaceだが、Maplikeという特殊な型で定義され�
 }
 ```
 
-## "Dictionary"キー, "Interface"キー
+### "Dictionary"キー, "Interface"キー
 DictionaryやInterfaceはクラスに相当する。  
 解析データには、"Dictionary"キーや"Interface"キーの配下にそれぞれまとめられ名前をキーとして出力される。
 
@@ -221,7 +221,7 @@ DictionaryやInterfaceはクラスに相当する。  
 }
 ```
 
-### "Superclass"キー
+#### "Superclass"キー
   基底クラスがある場合、解析データに"Superclass"というキー(値は基底クラス名)が追加される。
 
 解析データ出力例
@@ -235,7 +235,7 @@ DictionaryやInterfaceはクラスに相当する。  
 }
 ```
 
-### "Ctor"キー
+#### "Ctor"キー
 コンストラクターがある場合、解析データに"Ctor"というキーが追加される。
 現時点でのWebRTCのドラフト仕様においては、一つのクラスに対して複数のコンストラクターが定義されているものはないのだが、他のAPIの仕様ページにおいて複数のコンストラクターがあるものが存在するため、
 "Ctor"キーに設定される値は将来他の仕様に対応する可能性を考慮し配列となっている。
@@ -265,7 +265,7 @@ DictionaryやInterfaceはクラスに相当する。  
 }
 ```
 
-### "Attribute"キー、"Member"キー、"Method"キー、"readonly"キー、"static"キー、"defaultValue"キー
+#### "Attribute"キー、"Member"キー、"Method"キー、"readonly"キー、"static"キー、"defaultValue"キー
 DictionaryやInterfaceのメンバーには、AttributeやMethod(Interface)やMember(Dictionary)がある。
 これらメンバーがある場合は、そのDictionaryやInterfaceの配下に"Attribute"キー、"Method"キー、"Member"キーの配下にまとめられ
 それぞれのメンバー名をキーとして追加される。
