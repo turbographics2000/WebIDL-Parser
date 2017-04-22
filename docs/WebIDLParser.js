@@ -91,6 +91,8 @@ function WebIDLParse(doc, optimize) {
             extAttrParse(groupElm, groupItemData);
             var types = typeParse(groupElm.querySelector('.idlMaplike'));
             if (types) {
+                debugger;
+                
                 parseData.Maplike = parseData.Maplike || {};
                 parseData.Maplike[id] = {
                     key: {
