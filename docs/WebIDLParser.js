@@ -164,6 +164,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             var typeDecs = ['frozenarray', 'record', 'sequence'];
             if(elm.className === 'idlAttribute') typeDecs.push('promise');
             if(typeDec && !typeDecs.includes(typeDec[1].toLowerCase())) {
+                console.log(typeDec[1]);
                 memberItemData[typeDec[1]] = true;                
             }
 
