@@ -89,19 +89,19 @@ function WebIDLParse(doc, optimize) {
             var id = getText(groupElm.querySelector(`.idl${group}ID`));
             var groupItemData = groupData[id] = groupData[id] || {};
             extAttrParse(groupElm, groupItemData);
-            var types = typeParse(groupElm.querySelector('.idlMaplike'));
-            if (types) {
-                parseData.Maplike = parseData.Maplike || {};
-                parseData.Maplike[id] = {
-                    key: {
-                        type: [{ typeName: types[0].typeName[0] }]
-                    },
-                    value: {
-                        type: [{ typeName: types[0].typeName[1] }]
-                    }
-                };
-                return;
-            }
+            // var types = typeParse(groupElm.querySelector('.idlMaplike'));
+            // if (types) {
+            //     parseData.Maplike = parseData.Maplike || {};
+            //     parseData.Maplike[id] = {
+            //         key: {
+            //             type: [{ typeName: types[0].typeName[0] }]
+            //         },
+            //         value: {
+            //             type: [{ typeName: types[0].typeName[1] }]
+            //         }
+            //     };
+            //     return;
+            // }
             switch (group) {
                 case 'Dictionary':
                 case 'Interface':
@@ -276,7 +276,7 @@ function typeParse(typeElm) {
                 typeName: typeNames[1]
             };
         } else {
-            type.typeName = typeNames.length > 1 ? typeNames : typeNames[0];
+            //type.typeName = typeNames.length > 1 ? typeNames : typeNames[0];
         }
         types.push(type);
     });
