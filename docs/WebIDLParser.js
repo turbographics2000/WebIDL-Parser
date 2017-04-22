@@ -268,7 +268,7 @@ function typeParse(typeElm) {
             typeName = typeDec[2];
         }
         var typeNames = typeName.split(',').map(x => x.trim());
-        if(type.record) {
+        if(type.record || type.maplike) {
             type.key = {
                 typeName: typeNames[0]
             };
