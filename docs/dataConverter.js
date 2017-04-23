@@ -89,11 +89,11 @@ function paramPatternParse(data) {
     Object.keys(data).forEach(key => {
         var patterns = [];
         if(key === 'param') {
-            generateParamPattern(data[key], idx, ptn, patterns);
+            generateParamPattern(data[key], 0, [], patterns);
         } else if(key === 'over_load') {
             for(var i = 0, il = data[key].length; i < il; i++) {
                 var result = [];
-                generateParamPattern(data[key], idx, ptn, result);
+                generateParamPattern(data[key], 0, [], result);
                 if(result.length) patterns = patterns.concat(result);
             }
         }
