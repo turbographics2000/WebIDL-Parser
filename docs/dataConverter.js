@@ -45,8 +45,9 @@ function convertToCSType(data, types) {
     var csTypes = [];
     types.forEach(type => {
         var csType = {};
-        if(type.typeName.endsWith('?')) {
-           csType.typeName = type.typeName.substr(0, type.typeName.length - 1);
+        csType.typeName = type.typeName;
+        if(csType.typeName.endsWith('?')) {
+           csType.typeName = csType.typeName.substr(0, type.typeName.length - 1);
            csType.nullable = true; 
         }
         csType.typeName = csTypeNames[csType.typeName.toLowerCase()] || type.typeName;
