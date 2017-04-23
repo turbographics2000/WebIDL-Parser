@@ -157,19 +157,18 @@ function memberParse(groupElm, groupItemData, memberKind) {
             var memberItemData = null;
             if (memberKind === 'Ctor') {
                 memberItemData = {};
-            } else if (memberKind === 'Meth') {
+            } else {
+                memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
+            }
+            if (memberKind === 'Meth') {
                 if (memberData[memberName]) {
                     if (!memberData[memberName].over_load) {
                         memberData[memberName].over_load = [];
                         memberData[memberName].over_load.push(memberData[memberName].param);
                         delete memberData[memberName].param;
                     }
-                } else {
-                    memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
                 }
-            } else {
-                memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-            }
+            } 
             if (types) memberItemData.data_type = types;
             var typeDec = /([a-z]+?)<(.+?)>/i.exec(getText(elm));
             var typeDecs = ['frozenarray', 'record', 'sequence'];
