@@ -61,7 +61,9 @@ function convertToCSType(data, types) {
 }
 
 function patternFilter(pattern, result) {
-    var pattern_string = pattern.map(p => p.cs_type.typeName).join('');
+    var pattern_string = pattern.map(p => {
+        return p.cs_type.typeName;
+    }).join('');
     if (result.filter(res => res.pattern_string === pattern_string).length === 0) {
         result.push({
             pattern_string,
