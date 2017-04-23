@@ -294,16 +294,15 @@ function dataOptimize(data) {
     });
 }
 
-// function dataOptimize2(data) {
-//     Object.keys(data).forEach(group => {
-//         Object.keys(data[group]).forEach(objKey => {
-//             dataOptimize2_(data[group][objKey]);
-//         });
-//     });
-// }
-
 function dataOptimize2(data) {
-    return;
+    Object.keys(data).forEach(group => {
+        Object.keys(data[group]).forEach(objKey => {
+            dataOptimize2_(data[group][objKey]);
+        });
+    });
+}
+
+function dataOptimize2_(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize2(data[key]);
