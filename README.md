@@ -102,12 +102,14 @@ DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラ�
 }
 ```
 
-### "param"キー、"paramName"キー、"optional"キー
-コンストラクターやメソッド、コールバックのパラメーター(引数)がこのキーに出力される。
+### "param"キー、"over_load"キー、"paramName"キー、"optional"キー
+コンストラクターやメソッド、コールバックのパラメーター(引数)が"param"キーに出力される。
 引数の順番が重要となるため値は配列となり、配列の要素は"paramName"キー(引数名)と"data_type"キーを持つオブジェクトになる。
 また、optional引数には、解析データに"optional"キー(値はturu)が追加される。
+ただし、複数のコンストラクターやメソッドのオーバーロードがある場合は、"param"キーではなく"over_load"キーで配列で出力され、
+配列の配下にパラメーターのパターンの配列が出力される。
 
-解析データ出力例
+解析データ出力例("param"キー)
 ```javascript
 {
   "Callback": {
@@ -123,6 +125,67 @@ DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラ�
         }
       ]
     },
+  }
+}
+```
+
+解析データ出力例("over_load"キー)
+```javascript
+{
+  "Interface": {
+    "RTCDataChannel": {
+      "method": [
+        "send": {
+          "data_type": [
+              {
+                  "typeName": "void"
+              }
+          ],
+          "over_load": [
+            [
+              {
+                "paramName": "data",
+                "data_type": [
+                    {
+                      "typeName": "USVString"
+                    }
+                ]
+              }
+            ],
+            [
+              {
+                "paramName": "data",
+                "data_type": [
+                  {
+                    "typeName": "Blob"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "paramName": "data",
+                "data_type": [
+                  {
+                    "typeName": "ArrayBuffer"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "paramName": "data",
+                "data_type": [
+                  {
+                    "typeName": "ArrayBufferView"
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      }
+    }
   }
 }
 ```
@@ -238,7 +301,7 @@ DictionaryやInterfaceはクラスに相当する。  
 
 #### "Ctor"キー
 コンストラクターがある場合、解析データに"Ctor"というキーが追加される。
-現時点でのWebRTCのドラフト仕様においては、一つのクラスに対して複数のコンストラクターが定義されているものはないのだが、他のAPIの仕様ページにおいて複数のコンストラクターがあるものが存在するため、
+現時点でのWebRTCのドラフト仕様においては、一つのクラスに対して複数のコンストラクター(オーバーロード)が定義されているものはないのだが、他のAPIの仕様ページにおいて複数のコンストラクターがあるものが存在するため、
 "Ctor"キーに設定される値は将来他の仕様に対応する可能性を考慮し配列となっている。
 配列それぞれの要素には、各コンストラクターのパラメーター("param"キー)のあるオブジェクトが出力される。
 
