@@ -71,6 +71,7 @@ function generateParamPattern(param, idx, ptn, result){
             });
         }
     } else {
+        if(!param[idx].data_type.length) debugger;
     	for(var i = 0, l = param[idx].data_type.length; i < l; i++) {
 			var p = [].concat(ptn);
             var itm = {};
