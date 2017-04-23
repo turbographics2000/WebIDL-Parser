@@ -94,7 +94,7 @@ function paramPatternParse(data) {
         } else if(key === 'over_load') {
             for(var i = 0, il = data[key].length; i < il; i++) {
                 var result = [];
-                generateParamPattern(data[key][0], 0, [], result);
+                generateParamPattern(data[key][i], 0, [], result);
                 if(result.length) patterns = patterns.concat(result);
             }
         }
