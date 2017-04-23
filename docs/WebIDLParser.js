@@ -285,14 +285,6 @@ function typeParse(typeElm) {
 }
 
 function dataOptimize(data) {
-    Object.keys(data).forEach(group => {
-        Object.keys(data[group]).forEach(objKey => {
-            dataOptimize_(data[group][objKey]);
-        });
-    });
-}
-
-function dataOptimize_(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize(data[key]);
