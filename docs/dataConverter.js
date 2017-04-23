@@ -61,6 +61,7 @@ function convertToCSType(data, types) {
 }
 
 function patternFilter(pattern, result) {
+    if(!pattern.map) debugger;
     var pattern_string = pattern.map(p => {
         return p.cs_type.typeName;
     }).join('');
