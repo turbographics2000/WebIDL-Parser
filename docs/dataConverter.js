@@ -71,7 +71,7 @@ function generateParamPattern(param, idx, ptn, result){
             });
         }
     } else {
-        if(!param[idx].data_type.length) debugger;
+        if(!param[idx].data_type) debugger;
     	for(var i = 0, l = param[idx].data_type.length; i < l; i++) {
 			var p = [].concat(ptn);
             var itm = {};
@@ -94,7 +94,7 @@ function paramPatternParse(data) {
         } else if(key === 'over_load') {
             for(var i = 0, il = data[key].length; i < il; i++) {
                 var result = [];
-                generateParamPattern(data[key], 0, [], result);
+                generateParamPattern(data[key][0], 0, [], result);
                 if(result.length) patterns = patterns.concat(result);
             }
         }
