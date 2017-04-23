@@ -155,7 +155,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
 
             var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-            if (['Ctor', 'Method'].includes(memberKind)) {
+            if (['Ctor', 'Meth'].includes(memberKind)) {
                 if (memberItemData.param) {
                     if (!memberItemData.over_load) {
                         memberItemData.over_load = [];
