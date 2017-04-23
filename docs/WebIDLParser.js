@@ -295,14 +295,15 @@ function dataOptimize(data) {
 }
 
 function dataOptimize2(data) {
-    for(group of data) {
-        for(obj of group) {
-            for(memberKind of obj) {
-                dataOptimize2_2(memberKind);
-            }
-        }
-    }
+    Object.keys(data).forEach(group => {
+        Object.keys(data[group]).forEach(objKey => {
+            Object.keys(data[group][objKey]).forEach(memberKind => {
+                dataOptimize2_2(data[group][objKey][memberKind]);
+            });
+        });
+    });
 }
+
 function dataOptimize2_2(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
