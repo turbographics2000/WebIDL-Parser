@@ -71,5 +71,6 @@ function convertToCSData(data) {
         if(key === 'data_type') {
             convertToCSType(data, data[key]);
         }
+        convertToCSData(data[key]);
     });
 }
