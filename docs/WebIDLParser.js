@@ -138,11 +138,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
     var memberElms = groupElm.querySelectorAll(`.idl${memberKind}`);
     if (memberElms.length) {
         var memberData = null;
-        if (memberKind === 'Ctor') {
-            memberData = groupItemData[memberKind] = groupItemData[memberKind] || [];
-        } else {
-            memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
-        }
+        memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
         memberElms.forEach(elm => {
             memberKind = { Attribute: 'Attr', Method: 'Meth' }[memberKind] || memberKind;
             var memberName = getText(elm.querySelector(`.idl${memberKind}Name`));
