@@ -161,7 +161,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
             }
             if (memberKind === 'Meth') {
-                if (!Object.keys(memberItemData).length) {
+                if (memberItemData.param) {
                     if (!memberData[memberName].over_load) {
                         memberData[memberName].over_load = [];
                     }
@@ -180,7 +180,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
 
             var params = paramParse(elm);
             if (params) {
-                if (memberKind === 'Meth') {
+                if (memberItemData.over_load) {
                     memberItemData.over_load.push(params);
                 } else {
                     memberItemData.param = params;
