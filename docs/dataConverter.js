@@ -103,7 +103,7 @@ function paramPatternParse(data) {
                 generateParamPattern(data[key][i], 0, [], result);
                 if (result.length) {
                     for(var j = 0, jl = result.length; j < jl; j++) {
-                        patternFilter(result[j], patterns);
+                        patternFilter(result[j].pattern, patterns);
                     }
                 }
             }
