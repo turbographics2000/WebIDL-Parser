@@ -98,6 +98,7 @@ function paramPatternParse(data) {
             }
         }
         if(patterns.length) data.param_pattern = patterns;
+        paramPatternParse(data[key]);
     });
 }
 
