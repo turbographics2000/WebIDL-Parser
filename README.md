@@ -48,16 +48,16 @@ WebRTCのドラフト仕様ページでは、実際には
 }
 ```
 
-### "type"キー、"typeName"キー、"FrozenArray"キー、"record"キー、"sequence"キー(、"Promise"キー)
+### "data_type"キー、"typeName"キー、"FrozenArray"キー、"record"キー、"sequence"キー(、"Promise"キー)
 WebIDLのデータ型には、byteやunsined long, float, stringといった基本的な型やクラスなどがある。
-解析データには"type"というキーで型情報を出力する。
+解析データには"data_type"というキーで型情報を出力する。
 例えば、RTCPeerConnectionのaddTransceiver()の第一引数は、(MediaStreamTrack or DOMString)と複数の型を渡すことができる。
-このような場合にも対応できるよう"type"の値は配列となっている。
-"type"の配列の要素は"typeName"キー(値は型名)と、"FrozenArray"、"record"、"sequence"という型を修飾するキーワードがある場合は、そのキーワードのキー(値はtrue)を持つオブジェクトになる。
+このような場合にも対応できるよう"data_type"の値は配列となっている。
+"data_type"の配列の要素は"typeName"キー(値は型名)と、"FrozenArray"、"record"、"sequence"という型を修飾するキーワードがある場合は、そのキーワードのキー(値はtrue)を持つオブジェクトになる。
 RTCPeerConnectionのpeerIdentityは、WebIDLにおいてはメソッドではないのだが型がPromise型になっている。
 このRTCPeerConnectionのpeerIdentityのように、メソッドの戻り値ではなくメンバーの型がPromise型となっている場合は、
-"type"の配下に"Promise"キーが追加される。
-"type"はコンストラクターのパラメーターの型、メソッドのパラメーターや戻り値の型、メンバーの型、Maplikeのkey/valueの型などに出力される。
+"data_type"の配下に"Promise"キーが追加される。
+"data_type"はコンストラクターのパラメーターの型、メソッドのパラメーターや戻り値の型、メンバーの型、Maplikeのkey/valueの型などに出力される。
 
 解析データ出力例
 ```javascript
@@ -66,7 +66,7 @@ RTCPeerConnectionのpeerIdentityは、WebIDLにおいてはメソッドではな
     "RTCConfiguration": {
       "Member": {
         "iceServers": {
-          "type": [
+          "data_type": [
               {
                 "sequence": true,
                 "typeName": "RTCIceServer"
@@ -104,7 +104,7 @@ DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラ�
 
 ### "param"キー、"paramName"キー、"optional"キー
 コンストラクターやメソッド、コールバックのパラメーター(引数)がこのキーに出力される。
-引数の順番が重要となるため値は配列となり、配列の要素は"paramName"キー(引数名)と"type"キーを持つオブジェクトになる。
+引数の順番が重要となるため値は配列となり、配列の要素は"paramName"キー(引数名)と"data_type"キーを持つオブジェクトになる。
 また、optional引数には、解析データに"optional"キー(値はturu)が追加される。
 
 解析データ出力例
@@ -115,7 +115,7 @@ DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラ�
       "param": [
         {
           "name": "error",
-          "type": [
+          "data_type": [
             {
               "typeName": "DOMException"
             }
@@ -140,7 +140,7 @@ WebRTCのドラフト仕様ページで定義されているコールバック�
       "param": [
         {
           "name": "error",
-          "type": [
+          "data_type": [
             {
               "typeName": "DOMException"
             }
@@ -174,7 +174,7 @@ WebRTCのドラフト仕様ページで定義されているコールバック�
 ### "Maplike"キー
 WebRTCのドラフト仕様ページでMaplikeが使用されているのは、現時点でRTCStatsReportのみである。
 RTCStatsReportはInterfaceだが、Maplikeという特殊な型で定義されているため、Maplikeキーを設けて出力する。
-キーの配下には"key"キーと"value"キーを配置。それぞれの値は"type"キーを有するオブジェクトを出力する。
+キーの配下には"key"キーと"value"キーを配置。それぞれの値は"data_type"キーを有するオブジェクトを出力する。
 
 解析データ出力例
 ```javascript
@@ -182,14 +182,14 @@ RTCStatsReportはInterfaceだが、Maplikeという特殊な型で定義され�
   "Maplike": {
     "RTCStatsReport": {
       "key": {
-        "type": [
+        "data_type": [
           {
             "typeName": "DOMString"
           }
         ]
       },
       "value": {
-        "type": [
+        "data_type": [
           {
             "typeName": "object"
           }
@@ -252,7 +252,7 @@ DictionaryやInterfaceはクラスに相当する。  
           "param": [
             {
               "name": "descriptionInitDict",
-              "type": [
+              "data_type": [
                 {
                   "typeName": "RTCSessionDescriptionInit"
                 }
@@ -270,7 +270,7 @@ DictionaryやInterfaceはクラスに相当する。  
 DictionaryやInterfaceのメンバーには、AttributeやMethod(Interface)やMember(Dictionary)がある。
 これらメンバーがある場合は、そのDictionaryやInterfaceの配下に"Attribute"キー、"Method"キー、"Member"キーの配下にまとめられ
 それぞれのメンバー名をキーとして追加される。
-それぞれのメンバー名キー配下には"type"キーがある。ただし、Methodメンバー配下の"type"キーは戻り値の型を示す。
+それぞれのメンバー名キー配下には"data_type"キーがある。ただし、Methodメンバー配下の"data_type"キーは戻り値の型を示す。
 staticなメンバーの場合は、そのメンバー配下に"static"というキー(値はtrue)が追加される。
 readonlyのメンバー(Attributeのみ)の場合は、そのメンバー配下に"readonly"というキー(値はtrue)が追加される。
 メンバーにデフォルト値がある場合は、そのメンバーの配下に"defaultValue"というキー(値はデフォルト値)が追加される。
