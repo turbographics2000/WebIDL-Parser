@@ -51,7 +51,7 @@ function convertToCSType(data, types) {
             csType.nullable = true;
         }
         csType.typeName = csTypeNames[csType.typeName.toLowerCase()] || csType.typeName;
-        if (type.sequence) csType.array = true;
+        if (type.sequence || type.typeName === 'ArrayBuffer' || type.typeName === 'ArrayBufferView') csType.array = true;
         if (primitiveTypes.includes(csType.typeName)) csType.primitive = true;
         if (csType.typeName === 'string' && csType.array) csType.primitive = false;
         csType.proxyType = csType.primitive ? csType.typeName : 'json';
