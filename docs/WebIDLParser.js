@@ -157,6 +157,14 @@ function memberParse(groupElm, groupItemData, memberKind) {
             var memberItemData = null;
             if (memberKind === 'Ctor') {
                 memberItemData = {};
+            } else if (memberKind === 'Method') {
+                if (memberData[memberName]) {
+                    if (!memberData[memberName].over_load) {
+                        memberData[memberName].over_load = [];
+                        memberData[memberName].over_load.push(memberData[memberName].param);
+                        delete memberData[memberName].param;
+                    }
+                }
             } else {
                 memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
             }
@@ -173,7 +181,11 @@ function memberParse(groupElm, groupItemData, memberKind) {
 
             var params = paramParse(elm);
             if (params) {
-                memberItemData.param = params;
+                if (memberKind === 'Method') {
+                    memberItemData.over_load.push(params);
+                } else {
+                    memberItemData.param = params;
+                }
             }
 
             var defaultValue = getText(elm.querySelector(`.idl${memberKind}Value`));
