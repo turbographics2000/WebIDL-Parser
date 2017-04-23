@@ -52,7 +52,7 @@ function convertToCSType(data, types) {
             csType.typeName = csTypeNames[type.typeName.toLowerCase()] || type.typeName;
         }
         if(type.sequence) csType.array = true;
-        csType.primitive = primitiveTypes.includes(csType.typeName);
+        if(primitiveTypes.includes(csType.typeName)) csType.primitive = true;
         if(csType.typeName === 'string' && csType.array) csType.primitive = false; 
         csType.proxyType = csType.primitive ? csType.typeName : 'string';
         csTypes.push(csType);
