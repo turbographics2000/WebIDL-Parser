@@ -288,13 +288,13 @@ function dataOptimize(data) {
     Object.keys(data).forEach(group => {
         Object.keys(data[group]).forEach(objKey => {
             Object.keys(data[group][objKey]).forEach(memberKind => {
-                dataOptimize2(data[group][objKey][memberKind]);
+                dataOptimize_(data[group][objKey][memberKind]);
             });
         });
     });
 }
 
-function dataOptimize2(data) {
+function dataOptimize_(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize(data[key]);
@@ -304,14 +304,23 @@ function dataOptimize2(data) {
     });
 }
 
-// function dataOptimize2_2(data) {
-//     if (typeof data !== 'object') return;
-//     Object.keys(data).forEach(key => {
-//         dataOptimize2(data[key]);
-//         var subKeys = Object.keys(data[key]);
-//         if (subKeys.length === 1) {
-//             data[key] = data[key][subKeys[0]];
-//         }
-//     });
+function dataOptimize2(data) {
+    Object.keys(data).forEach(group => {
+        Object.keys(data[group]).forEach(objKey => {
+            Object.keys(data[group][objKey]).forEach(memberKind => {
+                dataOptimize2_(data[group][objKey][memberKind]);
+            });
+        });
+    });
+}
 
-// }
+function dataOptimize2_(data) {
+    if (typeof data !== 'object') return;
+    Object.keys(data).forEach(key => {
+        dataOptimize2(data[key]);
+        var subKeys = Object.keys(data[key]);
+        if (subKeys.length === 1) {
+            data[key] = data[key][subKeys[0]];
+        }
+    });
+}
