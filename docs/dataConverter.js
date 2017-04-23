@@ -104,7 +104,7 @@ function paramParse(data) {
 
 function convertToCSData(data) {
     dataTypeParse(data);
-    paramParse(data);
+    //paramParse(data);
 }
 
 function dataTypeParse(data) {
