@@ -161,7 +161,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
             }
             if (memberKind === 'Meth') {
-                if (memberData[memberName]) {
+                if (!Object.keys(memberItemData).length) {
                     if (!memberData[memberName].over_load) {
                         memberData[memberName].over_load = [];
                     }
