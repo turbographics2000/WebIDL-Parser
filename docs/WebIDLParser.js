@@ -154,13 +154,8 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 return;
             }
 
-            var memberItemData = null;
-            if (memberKind === 'Ctor') {
-                memberItemData = {};
-            } else {
-                memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
-            }
-            if (memberKind === 'Meth') {
+            var memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
+            if (['Ctor', 'Method'].includes(memberKind)) {
                 if (memberItemData.param) {
                     if (!memberItemData.over_load) {
                         memberItemData.over_load = [];
@@ -196,10 +191,6 @@ function memberParse(groupElm, groupItemData, memberKind) {
 
             if (memberKind === 'Superclass') {
                 memberData = getText(elm);
-            }
-
-            if (memberKind === 'Ctor') {
-                memberData.push(memberItemData);
             }
         });
     }
