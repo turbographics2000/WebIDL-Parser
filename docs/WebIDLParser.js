@@ -160,7 +160,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             } else {
                 memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
             }
-            if (types) memberItemData.type = types;
+            if (types) memberItemData.data_type = types;
             var typeDec = /([a-z]+?)<(.+?)>/i.exec(getText(elm));
             var typeDecs = ['frozenarray', 'record', 'sequence'];
             if (elm.className === 'idlAttribute') typeDecs.push('promise');
