@@ -94,10 +94,10 @@ function WebIDLParse(doc, optimize) {
                 parseData.Maplike = parseData.Maplike || {};
                 parseData.Maplike[id] = {
                     key: {
-                        type: [{ typeName: types[0].typeName[0] }]
+                        data_type: [{ typeName: types[0].typeName[0] }]
                     },
                     value: {
-                        type: [{ typeName: types[0].typeName[1] }]
+                        data_type: [{ typeName: types[0].typeName[1] }]
                     }
                 };
                 if (types[0].readonly) parseData.Maplike[id].readonly = true;
