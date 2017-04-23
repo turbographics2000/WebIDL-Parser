@@ -64,6 +64,7 @@ function convertToCSType(data, types) {
 function generateParamPattern(param, idx, ptn, result){
 	if(idx === param.length){
         var ptnStr = ptn.map(p => p.cs_type.typeName).join('');
+        if(ptnStr === 'byte') debugger;
         if(result.filter(res => res.ptnStr === ptnStr).length === 0) {
             result.push({
                 ptnStr: ptnStr,
