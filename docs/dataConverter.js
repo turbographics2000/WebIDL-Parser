@@ -76,9 +76,10 @@ function generateParamPattern(param, idx, ptn, result){
 			var p = [].concat(ptn);
             var itm = {};
             Object.keys(param[idx]).forEach(key => {
-                if(key !== 'data_type') itm[key] = param[idx][key];
+                if(!['data_type', 'csType'].includes(key)) itm[key] = param[idx][key];
             });
             itm.data_type = param[idx].data_type[i];
+            itm.csType = param[idx].csType[i];
 			p.push(itm);
 			generateParamPattern(param, idx + 1, p, result);
         }
