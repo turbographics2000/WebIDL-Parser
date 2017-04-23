@@ -46,37 +46,75 @@ function convertToCSType(data, types) {
     types.forEach(type => {
         var csType = {};
         csType.typeName = type.typeName;
-        if(csType.typeName.endsWith('?')) {
-           csType.typeName = csType.typeName.substr(0, type.typeName.length - 1);
-           csType.nullable = true; 
+        if (csType.typeName.endsWith('?')) {
+            csType.typeName = csType.typeName.substr(0, type.typeName.length - 1);
+            csType.nullable = true;
         }
         csType.typeName = csTypeNames[csType.typeName.toLowerCase()] || csType.typeName;
-        if(type.sequence) csType.array = true;
-        if(primitiveTypes.includes(csType.typeName)) csType.primitive = true;
-        if(csType.typeName === 'string' && csType.array) csType.primitive = false; 
+        if (type.sequence) csType.array = true;
+        if (primitiveTypes.includes(csType.typeName)) csType.primitive = true;
+        if (csType.typeName === 'string' && csType.array) csType.primitive = false;
         csType.proxyType = csType.primitive ? csType.typeName : 'json';
         csTypes.push(csType);
     });
     data.csType = csTypes;
 }
 
-function generateParamPattern(data, params) {
-    if(params.forEach) {
-        params.forEach(param => {
-            convertToCSType(param, param.type);
-        });
+
+function generateParamPattern(param, idx, ptn, result){
+	if(idx === param.length){
+        var ptnStr = ptn.map(p => p.data_type.typeName).join('');
+        if(result.filter(res => res.ptnStr === ptnStr).length === 0) {
+            result.push({
+                ptnStr: ptnStr,
+                ptn: ptn
+            });
+        }
     } else {
-        convertToCSData()
-    }
+    	for(var i = 0, l = param[idx].data_type.length; i < l; i++) {
+			var p = [].concat(ptn);
+            var itm = {};
+            Object.keys(param[idx]).forEach(key => {
+                if(key !== 'data_type') itm[key] = param[idx][key];
+            });
+            itm.data_type = param[idx].data_type[i];
+			p.push(itm);
+			generateParamPattern(param, idx + 1, p, result);
+        }
+	}
 }
 
-function convertToCSData(data) {
-    if(typeof data !== 'object') return;
+function paramParse(data) {
+    if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
-        if(key === 'data_type') {
-            convertToCSType(data, data[key]);
-            delete data[key];
+        var patterns = [];
+        if(key === 'param') {
+            generateParamPattern(data[key], idx, ptn, patterns);
+        } else if(key === 'over_load') {
+            for(var i = 0, il = data[key].length; i < il; i++) {
+                var result = [];
+                generateParamPattern(data[key], idx, ptn, result);
+                if(result.length) patterns = patterns.concat(result);
+            }
         }
-        convertToCSData(data[key]);
+        if(pattern.length) data.param_pattern = patterns;
     });
+}
+
+
+function convertToCSData(data) {
+    dataTypeParse(data);
+    paramParse(data);
+}
+
+function dataTypeParse(data) {
+    if (typeof data !== 'object') return;
+    Object.keys(data).forEach(key => {
+        if (key === 'data_type') {
+            convertToCSType(data, data[key]);
+            //delete data[key];
+        }
+        dataTypeParse(data[key]);
+    });
+
 }
