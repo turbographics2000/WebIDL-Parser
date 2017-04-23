@@ -84,7 +84,7 @@ function generateParamPattern(param, idx, ptn, result){
 	}
 }
 
-function paramParse(data) {
+function paramPatternParse(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         var patterns = [];
@@ -104,7 +104,7 @@ function paramParse(data) {
 
 function convertToCSData(data) {
     dataTypeParse(data);
-    //paramParse(data);
+    //paramPatternParse(data);
 }
 
 function dataTypeParse(data) {
