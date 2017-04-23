@@ -233,7 +233,7 @@ function paramParse(target) {
 
         var prm = {
             paramName: getText(param.querySelector('.idlParamName')),
-            type: typeParse(param.querySelector('.idlParamType'))
+            data_type: typeParse(param.querySelector('.idlParamType'))
         };
         var txt = getText(param);
         if (txt.startsWith('optional ')) {
@@ -241,7 +241,7 @@ function paramParse(target) {
         }
         var defaultValue = getText(param.querySelector('.idlMemberValue'));
         if (defaultValue) {
-            if (prm.type[0].isPrimitive && prm.type[0].type !== 'string') {
+            if (prm.data_type[0].isPrimitive && prm.data_type[0].typeName !== 'string') {
                 defaultValue = +defaultValue;
             }
             prm.defaultValue = defaultValue;
