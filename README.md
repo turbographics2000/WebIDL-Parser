@@ -142,9 +142,9 @@ DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラ�
               {
                 "paramName": "data",
                 "data_type": [
-                    {
-                      "typeName": "USVString"
-                    }
+                  {
+                    "typeName": "USVString"
+                  }
                 ]
               }
             ],
