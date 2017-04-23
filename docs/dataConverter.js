@@ -47,7 +47,8 @@ function convertToCSType(data, types) {
         var csType = {};
         csType.typeName = csTypeNames[type.typeName] || type.typeName;
         if(type.sequence) csType.array = true;
-        csType.primitive = primitiveTypes[csType.typeName];
+        debugger;
+        csType.primitive = !!primitiveTypes[csType.typeName];
         if(csType.typeName === 'string' && csType.array) csType.primitive = false; 
         csType.proxyType = csType.primitive ? csType.typeName : 'string';
         csTypes.push(csType);
