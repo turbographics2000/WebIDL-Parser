@@ -63,7 +63,7 @@ function convertToCSType(data, types) {
 
 function generateParamPattern(param, idx, ptn, result){
 	if(idx === param.length){
-        var ptnStr = ptn.map(p => p.data_type.typeName).join('');
+        var ptnStr = ptn.map(p => p.cs_type.typeName).join('');
         if(result.filter(res => res.ptnStr === ptnStr).length === 0) {
             result.push({
                 ptnStr: ptnStr,
@@ -72,13 +72,12 @@ function generateParamPattern(param, idx, ptn, result){
         }
     } else {
         if(!param[idx].data_type) debugger;
-    	for(var i = 0, l = param[idx].data_type.length; i < l; i++) {
+    	for(var i = 0, l = param[idx].cs_type.length; i < l; i++) {
 			var p = [].concat(ptn);
             var itm = {};
             Object.keys(param[idx]).forEach(key => {
                 if(!['data_type', 'cs_type'].includes(key)) itm[key] = param[idx][key];
             });
-            itm.data_type = param[idx].data_type[i];
             itm.cs_type = param[idx].cs_type[i];
 			p.push(itm);
 			generateParamPattern(param, idx + 1, p, result);
