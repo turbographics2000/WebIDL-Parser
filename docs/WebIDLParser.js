@@ -296,7 +296,9 @@ function dataOptimize(data) {
 
 function dataOptimize2(data) {
     Object.keys(data).forEach(group => {
-        dataOptimize2_(data[group]);
+        Object.keys(data[group]).forEach(objKey => {
+            dataOptimize2_(data[group][objKey]);
+        });
     });
 }
 
