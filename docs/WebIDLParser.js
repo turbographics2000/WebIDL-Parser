@@ -113,7 +113,6 @@ function WebIDLParse(doc, optimize) {
                     })
                     break;
                 case 'Callback':
-                debugger;
                     memberParse(groupElm, groupItemData, 'Callback');
                     var cbParams = paramParse(groupElm);
                     if (cbParams) groupItemData.param = cbParams;
