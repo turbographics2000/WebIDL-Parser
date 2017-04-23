@@ -136,11 +136,7 @@ DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラ�
     "RTCDataChannel": {
       "method": [
         "send": {
-          "data_type": [
-              {
-                  "typeName": "void"
-              }
-          ],
+          // ...
           "over_load": [
             [
               {
