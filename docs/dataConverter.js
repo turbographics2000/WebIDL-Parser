@@ -57,17 +57,21 @@ function convertToCSType(data, types) {
 }
 
 function generateParamPattern(data, params) {
-    params.forEach(param => {
-        convertToCSData(param, param.type);
-    });
+    if(params.forEach) {
+        params.forEach(param => {
+            convertToCSType(param, param.type);
+        });
+    } else {
+        convertToCSData()
+    }
 }
 
 function convertToCSData(data) {
     if(typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         switch(key) {
-            case 'param':
-                generateParamPattern(data, data[key]);
+            case 'paramName':
+                generateParamPattern(parentData);
                 break;
             case 'type':
                 convertToCSType(data, data[key]);
