@@ -164,6 +164,8 @@ function memberParse(groupElm, groupItemData, memberKind) {
                         memberData[memberName].over_load.push(memberData[memberName].param);
                         delete memberData[memberName].param;
                     }
+                } else {
+                    memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
                 }
             } else {
                 memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
