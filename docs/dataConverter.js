@@ -73,6 +73,7 @@ function patternFilter(pattern, result) {
 
 function generateParamPattern(param, idx, ptn, result) {
     if (idx === param.length) {
+        patternFilter(ptn, result);
     } else {
         if (!param[idx].data_type) debugger;
         for (var i = 0, l = param[idx].cs_type.length; i < l; i++) {
