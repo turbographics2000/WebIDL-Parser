@@ -162,8 +162,10 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
             if (memberKind === 'Meth') {
                 if (memberItemData.param) {
-                    if (!memberData[memberName].over_load) {
-                        memberData[memberName].over_load = [];
+                    if (!memberItemData.over_load) {
+                        memberItemData.over_load = [];
+                        memberItemData.over_load.push(memberItemData.param);
+                        delete memberItemData.param;
                     }
                 }
             } 
