@@ -45,7 +45,12 @@ function convertToCSType(data, types) {
     var csTypes = [];
     types.forEach(type => {
         var csType = {};
-        csType.typeName = csTypeNames[type.typeName] || type.typeName;
+        if(type.typeName.endsWith('?')) {
+           csType.typeName = type.typeName.substr(0, type.typeName.length - 1);
+           csType.nullable = true; 
+        } else {
+            csType.typeName = csTypeNames[type.typeName] || type.typeName;
+        }
         if(type.sequence) csType.array = true;
         debugger;
         csType.primitive = !!primitiveTypes[csType.typeName];
