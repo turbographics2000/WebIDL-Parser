@@ -284,7 +284,7 @@ function typeParse(typeElm) {
     return types;
 }
 
-function dataOptimize(data) {
+function dataOptimize_(data) {
     Object.keys(data).forEach(group => {
         Object.keys(data[group]).forEach(objKey => {
             Object.keys(data[group][objKey]).forEach(memberKind => {
@@ -294,7 +294,7 @@ function dataOptimize(data) {
     });
 }
 
-function dataOptimize_(data) {
+function dataOptimize(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize(data[key]);
@@ -304,7 +304,7 @@ function dataOptimize_(data) {
     });
 }
 
-function dataOptimize2(data) {
+function dataOptimize2_(data) {
     Object.keys(data).forEach(group => {
         Object.keys(data[group]).forEach(objKey => {
             Object.keys(data[group][objKey]).forEach(memberKind => {
@@ -314,7 +314,7 @@ function dataOptimize2(data) {
     });
 }
 
-function dataOptimize2_(data) {
+function dataOptimize2(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize2(data[key]);
