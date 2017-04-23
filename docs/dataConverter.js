@@ -75,6 +75,7 @@ function convertToCSData(data) {
     Object.keys(data).forEach(key => {
         if(key === 'data_type') {
             convertToCSType(data, data[key]);
+            delete data[key];
         }
         convertToCSData(data[key]);
     });
