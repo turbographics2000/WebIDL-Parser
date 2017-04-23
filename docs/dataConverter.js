@@ -97,7 +97,7 @@ function paramParse(data) {
                 if(result.length) patterns = patterns.concat(result);
             }
         }
-        if(pattern.length) data.param_pattern = patterns;
+        if(patterns.length) data.param_pattern = patterns;
     });
 }
 
