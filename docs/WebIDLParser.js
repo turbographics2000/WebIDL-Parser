@@ -286,7 +286,9 @@ function typeParse(typeElm) {
 
 function dataOptimize(data) {
     Object.keys(data).forEach(group => {
-        dataOptimize_(data[group]);
+        Object.keys(data[group]).forEach(objKey => {
+            dataOptimize_(data[group][objKey]);
+        });
     });
 }
 
@@ -300,13 +302,15 @@ function dataOptimize_(data) {
     });
 }
 
-function dataOptimize2(data) {
-    Object.keys(data).forEach(group => {
-        dataOptimize2_(data[group]);
-    });
-}
+// function dataOptimize2(data) {
+//     Object.keys(data).forEach(group => {
+//         Object.keys(data[group]).forEach(objKey => {
+//             dataOptimize2_(data[group][objKey]);
+//         });
+//     });
+// }
 
-function dataOptimize2_(data) {
+function dataOptimize2(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize2(data[key]);
