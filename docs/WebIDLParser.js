@@ -157,7 +157,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             var memberItemData = null;
             if (memberKind === 'Ctor') {
                 memberItemData = {};
-            } else if (memberKind === 'Method') {
+            } else if (memberKind === 'Meth') {
                 if (memberData[memberName]) {
                     if (!memberData[memberName].over_load) {
                         memberData[memberName].over_load = [];
@@ -181,7 +181,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
 
             var params = paramParse(elm);
             if (params) {
-                if (memberKind === 'Method') {
+                if (memberKind === 'Meth') {
                     memberItemData.over_load.push(params);
                 } else {
                     memberItemData.param = params;
