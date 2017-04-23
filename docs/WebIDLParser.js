@@ -100,14 +100,14 @@ function WebIDLParse(doc, optimize) {
                         type: [{ typeName: types[0].typeName[1] }]
                     }
                 };
-                if(types[0].readonly) parseData.Maplike[id].readonly = true;
+                if (types[0].readonly) parseData.Maplike[id].readonly = true;
                 return;
             }
             switch (group) {
                 case 'Dictionary':
                 case 'Interface':
                     var superclass = getText(groupElm.querySelector('.idlSuperclass'));
-                    if(superclass) groupItemData.Superclass = superclass;
+                    if (superclass) groupItemData.Superclass = superclass;
                     ['Ctor', 'Attribute', 'Member', 'Method', 'Maplike'].forEach(memberKind => {
                         memberParse(groupElm, groupItemData, memberKind);
                     })
@@ -138,7 +138,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
     var memberElms = groupElm.querySelectorAll(`.idl${memberKind}`);
     if (memberElms.length) {
         var memberData = null;
-        if(memberKind === 'Ctor') {
+        if (memberKind === 'Ctor') {
             memberData = groupItemData[memberKind] = groupItemData[memberKind] || [];
         } else {
             memberData = groupItemData[memberKind] = groupItemData[memberKind] || {};
@@ -155,7 +155,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
             }
 
             var memberItemData = null;
-            if(memberKind === 'Ctor') {
+            if (memberKind === 'Ctor') {
                 memberItemData = {};
             } else {
                 memberItemData = memberName ? memberData[memberName] = memberData[memberName] || {} : memberData;
@@ -163,9 +163,9 @@ function memberParse(groupElm, groupItemData, memberKind) {
             if (types) memberItemData.type = types;
             var typeDec = /([a-z]+?)<(.+?)>/i.exec(getText(elm));
             var typeDecs = ['frozenarray', 'record', 'sequence'];
-            if(elm.className === 'idlAttribute') typeDecs.push('promise');
-            if(typeDec && !typeDecs.includes(typeDec[1].toLowerCase())) {
-                memberItemData[typeDec[1]] = true;                
+            if (elm.className === 'idlAttribute') typeDecs.push('promise');
+            if (typeDec && !typeDecs.includes(typeDec[1].toLowerCase())) {
+                memberItemData[typeDec[1]] = true;
             }
 
             headerKeywordsParse(elm, memberItemData);
@@ -185,7 +185,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
                 memberData = getText(elm);
             }
 
-            if(memberKind === 'Ctor') {
+            if (memberKind === 'Ctor') {
                 memberData.push(memberItemData);
             }
         });
@@ -262,14 +262,14 @@ function typeParse(typeElm) {
         var type = {};
         if (typeDec) {
             typeDecs = ['frozenarray', 'record', 'sequence'];
-            if(typeElm.className === 'idlAttrType') typeDecs.push('promise');
-            if(typeDecs.includes(typeDec[1].toLowerCase())) {
+            if (typeElm.className === 'idlAttrType') typeDecs.push('promise');
+            if (typeDecs.includes(typeDec[1].toLowerCase())) {
                 type[typeDec[1]] = true;
             }
             typeName = typeDec[2];
         }
         var typeNames = typeName.split(',').map(x => x.trim());
-        if(type.record || type.maplike) {
+        if (type.record || type.maplike) {
             type.key = {
                 typeName: typeNames[0]
             };
@@ -295,6 +295,15 @@ function dataOptimize(data) {
 }
 
 function dataOptimize2(data) {
+    for(group of data) {
+        for(obj of group) {
+            for(memberKind of obj) {
+                dataOptimize2_2(memberKind);
+            }
+        }
+    }
+}
+function dataOptimize2_2(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize2(data[key]);
@@ -303,5 +312,5 @@ function dataOptimize2(data) {
             data[key] = data[key][subKeys[0]];
         }
     });
-}
 
+}
