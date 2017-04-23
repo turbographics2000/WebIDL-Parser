@@ -49,7 +49,7 @@ function convertToCSType(data, types) {
            csType.typeName = type.typeName.substr(0, type.typeName.length - 1);
            csType.nullable = true; 
         } else {
-            csType.typeName = csTypeNames[type.typeName] || type.typeName;
+            csType.typeName = csTypeNames[type.typeName.toLowerCase()] || type.typeName;
         }
         if(type.sequence) csType.array = true;
         csType.primitive = primitiveTypes.includes(csType.typeName);
