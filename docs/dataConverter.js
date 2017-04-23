@@ -48,9 +48,8 @@ function convertToCSType(data, types) {
         if(type.typeName.endsWith('?')) {
            csType.typeName = type.typeName.substr(0, type.typeName.length - 1);
            csType.nullable = true; 
-        } else {
-            csType.typeName = csTypeNames[type.typeName.toLowerCase()] || type.typeName;
         }
+        csType.typeName = csTypeNames[csType.typeName.toLowerCase()] || type.typeName;
         if(type.sequence) csType.array = true;
         if(primitiveTypes.includes(csType.typeName)) csType.primitive = true;
         if(csType.typeName === 'string' && csType.array) csType.primitive = false; 
