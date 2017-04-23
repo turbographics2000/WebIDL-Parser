@@ -311,6 +311,7 @@ function dataOptimize_(data) {
 // }
 
 function dataOptimize2(data) {
+    return;
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         dataOptimize2(data[key]);
