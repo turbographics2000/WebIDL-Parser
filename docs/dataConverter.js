@@ -43,7 +43,6 @@ var primitiveTypes = [
 
 function convertToCSType(data, types) {
     var csTypes = [];
-    if(!types.forEach) return;
     types.forEach(type => {
         var csType = {};
         csType.typeName = csTypeNames[type.typeName] || type.typeName;
@@ -69,7 +68,7 @@ function generateParamPattern(data, params) {
 function convertToCSData(data) {
     if(typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
-        if(key === 'dataType') {
+        if(key === 'data_type') {
             convertToCSType(data, data[key]);
         }
     });
