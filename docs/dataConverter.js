@@ -60,46 +60,52 @@ function convertToCSType(data, types) {
     data.cs_type = csTypes;
 }
 
+function patternFilter(pattern, result) {
+    var pattern_string = pattern.map(p => p.cs_type.typeName).join('');
+    if (ptnStr === 'byte') debugger;
+    if (result.filter(res => res.pattern_string === pattern_string).length === 0) {
+        result.push({
+            pattern_string,
+            pattern
+        });
+    }
+}
 
-function generateParamPattern(param, idx, ptn, result){
-	if(idx === param.length){
-        var ptnStr = ptn.map(p => p.cs_type.typeName).join('');
-        if(ptnStr === 'byte') debugger;
-        if(result.filter(res => res.ptnStr === ptnStr).length === 0) {
-            result.push({
-                ptnStr: ptnStr,
-                ptn: ptn
-            });
-        }
+function generateParamPattern(param, idx, ptn, result) {
+    if (idx === param.length) {
     } else {
-        if(!param[idx].data_type) debugger;
-    	for(var i = 0, l = param[idx].cs_type.length; i < l; i++) {
-			var p = [].concat(ptn);
+        if (!param[idx].data_type) debugger;
+        for (var i = 0, l = param[idx].cs_type.length; i < l; i++) {
+            var p = [].concat(ptn);
             var itm = {};
             Object.keys(param[idx]).forEach(key => {
-                if(!['data_type', 'cs_type'].includes(key)) itm[key] = param[idx][key];
+                if (!['data_type', 'cs_type'].includes(key)) itm[key] = param[idx][key];
             });
             itm.cs_type = param[idx].cs_type[i];
-			p.push(itm);
-			generateParamPattern(param, idx + 1, p, result);
+            p.push(itm);
+            generateParamPattern(param, idx + 1, p, result);
         }
-	}
+    }
 }
 
 function paramPatternParse(data) {
     if (typeof data !== 'object') return;
     Object.keys(data).forEach(key => {
         var patterns = [];
-        if(key === 'param') {
+        if (key === 'param') {
             generateParamPattern(data[key], 0, [], patterns);
-        } else if(key === 'over_load') {
-            for(var i = 0, il = data[key].length; i < il; i++) {
+        } else if (key === 'over_load') {
+            for (var i = 0, il = data[key].length; i < il; i++) {
                 var result = [];
                 generateParamPattern(data[key][i], 0, [], result);
-                if(result.length) patterns = patterns.concat(result);
+                if (result.length) {
+                    patternFilter(result, patterns);
+                }
             }
         }
-        if(patterns.length) data.param_pattern = patterns;
+        if (patterns.length) {
+            data.param_pattern = patterns;
+        }
         paramPatternParse(data[key]);
     });
 }
