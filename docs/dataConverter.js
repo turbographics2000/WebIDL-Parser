@@ -101,7 +101,9 @@ function paramPatternParse(data) {
                 var result = [];
                 generateParamPattern(data[key][i], 0, [], result);
                 if (result.length) {
-                    patternFilter(result, patterns);
+                    for(var j = 0, jl = result.length; j < jl; j++) {
+                        patternFilter(result[j], patterns);
+                    }
                 }
             }
         }
