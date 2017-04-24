@@ -283,12 +283,12 @@ function generateCS(parseData, classStructs, arrayToList) {
                 addCSLine(`public ${retType} ${methodName}(string instanceId${paramString3})`);
                 addCSLine('{');
                 if (isVoid) {
-                    addCSLine(`_${methodName}(instanceId,${paramString2});`);
+                    addCSLine(`_${methodName}(instanceId${paramString2});`);
                 } else {
                     if (isPrimitive) {
                         addCSLine(`${isVoid ? '' : 'return '}_${methodName}(instanceId${paramString2});`);
                     } else {
-                        addCSLine(`var json = _${methodName}(instanceId, ${paramString2});`);
+                        addCSLine(`var json = _${methodName}(instanceId${paramString2});`);
                         addCSLine(`var ret = JsonUtility.fromJson<${retType}>(json);`);
                         addCSLine('return ret;');
                     }
