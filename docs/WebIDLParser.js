@@ -35,8 +35,8 @@ function WebIDLParse(doc, optimize) {
                     break;
                 case 'Enum':
                     groupElm.querySelectorAll('.idlEnumItem').forEach(item => {
-                        groupItemData.items = groupItemData.items || [];
-                        groupItemData.items.push(getText(item).replace(/"/g, ''));
+                        groupItemData.item = groupItemData.item || [];
+                        groupItemData.item.push(getText(item).replace(/"/g, ''));
                     });
                     break;
             }

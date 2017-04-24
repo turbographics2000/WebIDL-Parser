@@ -65,6 +65,7 @@ var csIndentLevel = 0;
 var managerNameSpace = 'UnityWebGLWebRTC';
 
 function camelize(txt, forceUpperCase) {
+    if(txt === 'new') return 'New';
     return txt.split('-').map((elm, idx) => {
         var arr = elm.split('');
         if (idx === 0 && !forceUpperCase) {
@@ -343,19 +344,19 @@ function generateCS(parseData, classStructs, arrayToList) {
 
                     if (data.Member) {
                         Object.keys(data.Member).forEach(memberName => {
-                            attrOrMemberAddCSLine(memberName, data.members[memberName]);
+                            attrOrMemberAddCSLine(memberName, data.Member[memberName]);
                         });
                     }
 
                     if (data.Method) {
                         if (id === 'RTCDataChannel') debugger;
                         Object.keys(data.Method).forEach(methodName => {
-                            methodAddCSLine(methodName, data.method[methodName]);
+                            methodAddCSLine(methodName, data.Method[methodName]);
                         });
                     }
 
                     if (data.EventHandler) {
-                        data.eventHandlers.forEach(eventHandlerName => {
+                        data.EventHandler.forEach(eventHandlerName => {
                             addCSLine();
                             addCSLine(`[MonoPInvokeCallback(typeof (Action<string>))]`);
                             addCSLine(`private static void _${eventHandlerName}(string instanceId) `);
@@ -392,12 +393,12 @@ function generateCS(parseData, classStructs, arrayToList) {
                 addCSLine();
                 addCSLine(`namespace ${managerNameSpace} `);
                 addCSLine('{');
-                Object.keys(rtcObj).forEach(id => {
-                    var enm = rtcObj[id];
-                    addCSLine(`public enum ${id} ${(enm.superClassName ? ' : ' + enm.superClassName : '')} `);
+                Object.keys(groupData).forEach(id => {
+                    var enm = groupData[id];
+                    addCSLine(`public enum ${id} ${enm.superClassName ? ' : ' + enm.superClassName : ''}`);
                     addCSLine(`{`);
-                    enm.items && enm.items.forEach((item, idx) => {
-                        addCSLine(`${item.item} ` + (enm.items.length - 1 > idx ? ',' : '') + ` // ${item.rawItem}`);
+                    enm.items && enm.item.forEach((item, idx) => {
+                        addCSLine(`${camelize(item)}${enm.items.length - 1 > idx ? ',' : ''} // ${item}`);
                     });
                     addCSLine(`}`);
                 });
