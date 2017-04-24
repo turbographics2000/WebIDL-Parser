@@ -188,7 +188,7 @@ function typeParse(typeElm) {
         if (type.record) {
             setKeyValueType(type, typeNames);
         } else {
-            type.typeName = typeNames[0];
+            type.typeName = type.maplike ? typeNames : typeNames[0];
         }
         types.push(type);
     });
