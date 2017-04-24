@@ -14,6 +14,7 @@ function WebIDLParse(doc, optimize) {
             var types = typeParse(groupElm.querySelector('.idlMaplike'));
             if (types) {
                 parseData.Maplike = parseData.Maplike || {};
+                parseData.Maplike[id] = {};
                 setKeyValueType(parseData.Maplike[id], types[0].typeName);
                 if (types[0].readonly) parseData.Maplike[id].readonly = true;
                 return;
