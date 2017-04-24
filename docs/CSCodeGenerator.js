@@ -63,6 +63,7 @@ var csCode = '';
 var csIndentSize = 2;
 var csIndentLevel = 0;
 var managerNameSpace = 'UnityWebGLWebRTC';
+var useListClasses = [];
 
 function camelize(txt, forceUpperCase) {
     if(txt === 'new') return 'New';
