@@ -147,6 +147,7 @@ function generateCS(parseData, classStructs, arrayToList) {
 
     var attrOrMemberAddCSLine = (name, data) => {
         var camName = camelize(name, true);
+        if(!data.cs_type[0]) debugger;
         var type = data.cs_type[0];
         if(type.array && !type.primitive) {
             useListClasses.push(type.typeName);
