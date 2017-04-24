@@ -305,7 +305,7 @@ WebRTCのドラフト仕様ページで定義されているコールバック�
 
 ### "Maplike"キー
 WebRTCのドラフト仕様ページでMaplikeが使用されているのは、現時点でRTCStatsReportのみである。  
-RTCStatsReportはInterfaceだが、Maplikeという特殊な型で定義されているため、Maplikeキーを設けて出力する。
+RTCStatsReportはInterfaceだが、Maplikeという特殊な型で定義されているため、Maplikeキーを設けて出力する。  
 キーの配下には"key"キーと"value"キーを配置。それぞれの値は"data_type"キーを有するオブジェクトを出力する。
 
 解析データ出力例
