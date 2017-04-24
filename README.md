@@ -125,13 +125,11 @@ WebRTCのドラフト仕様ページでは、実際には
 
 ### "data_type"キー、"typeName"キー、"FrozenArray"キー、"record"キー、"sequence"キー(、"Promise"キー)
 WebIDLのデータ型には、byteやunsined long, float, stringといった基本的な型やクラスなどがある。
-解析データには"data_type"というキーで型情報を出力する。
-例えば、RTCPeerConnectionのaddTransceiver()の第一引数は、(MediaStreamTrack or DOMString)と複数の型を渡すことができる。
-このような場合にも対応できるよう"data_type"の値は配列となっている。
-"data_type"の配列の要素は"typeName"キー(値は型名)と、"FrozenArray"、"record"、"sequence"という型を修飾するキーワードがある場合は、そのキーワードのキー(値はtrue)を持つオブジェクトになる。
-RTCPeerConnectionのpeerIdentityは、WebIDLにおいてはメソッドではないのだが型がPromise型になっている。
-このRTCPeerConnectionのpeerIdentityのように、メソッドの戻り値ではなくメンバーの型がPromise型となっている場合は、
-"data_type"の配下に"Promise"キーが追加される。
+解析データには"data_type"というキーで型情報を出力する。  
+例えば、RTCPeerConnectionのaddTransceiver()の第一引数は、(MediaStreamTrack or DOMString)と複数の型を渡すことができる。  このような場合にも対応できるよう"data_type"の値は配列となっている。  
+"data_type"の配列の要素は"typeName"キー(値は型名)と、"FrozenArray"、"record"、"sequence"という型を修飾するキーワードがある場合は、そのキーワードのキー(値はtrue)を持つオブジェクトになる。  
+RTCPeerConnectionのpeerIdentityは、WebIDLにおいてはメソッドではないのだが型がPromise型になっている。このRTCPeerConnectionのpeerIdentityのように、メソッドの戻り値ではなくメンバーの型がPromise型となっている場合は、"data_type"の配下に"Promise"キーが追加される。  
+(メソッドの場合はメソッドの配下に"Promise"キーが追加される。)  
 "data_type"はコンストラクターのパラメーターの型、メソッドのパラメーターや戻り値の型、メンバーの型、Maplikeのkey/valueの型などに出力される。
 
 解析データ出力例
@@ -156,9 +154,9 @@ RTCPeerConnectionのpeerIdentityは、WebIDLにおいてはメソッドではな
 
 ### "extAttr"キー、"extAttrName"キー、"extAttrRhs"キー
 属性は、DictionaryやInterface自体やDictionaryやInterfaceの各メンバーなどに設定される。
-属性がある場合は、それぞれのキーの配下に"extAttr"キーとして出力される。複数の属性がある場合が考えられるため値は配列となる。
-DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラクターも属性に含まれるのだが、
-コンストラクターは"Ctor"キーで出力し、コンストラクター以外に属性がある場合に"extAttr"キーで出力される。
+属性がある場合は、それぞれのキーの配下に"extAttr"キーとして出力される。  
+複数の属性がある場合が考えられるため値は配列となる。
+DictionaryやInterface自体の属性の場合、WebIDL仕様においてはコンストラクターも属性に含まれるが、コンストラクターは"Ctor"キーで出力し、コンストラクター以外に属性がある場合に"extAttr"キーで出力される。
 "extAttr"キーは、"extAttrName"キー(属性名)、また値がある場合は"extAttrRhs"キーとして出力される。
 
 解析データ出力例
@@ -262,9 +260,9 @@ DictionaryやInterface自体の属性の場合、WebIDL仕様上コンストラ�
 ```
 
 ### "Callback"キー
-WebRTCのドラフト仕様ページで定義されているコールバックは、コールバックで渡される引数を定義したものとなっている。
+WebRTCのドラフト仕様ページで定義されているコールバックは、コールバックで渡される引数を定義したものとなっている。  
 解析データでは"Callback"というキーの配下にまとめられて出力される。
-引数の情報は"param"というキーに順番も重要になるため配列で出力される。
+引数の情報は"param"キーが配下に出力される。
 
 解析データ出力例
 ```javascript
@@ -287,7 +285,7 @@ WebRTCのドラフト仕様ページで定義されているコールバック�
 ```
 
 ### "Enum"キー
-列挙型はEnumキーの配下にまとめられ、名前をキーとして出力される。
+列挙型はEnumキーの配下にまとめられ、名前をキーとして出力される。  
 列挙型の各値は、"items"キーに配列として出力される。
 
 解析データ出力例
@@ -306,7 +304,7 @@ WebRTCのドラフト仕様ページで定義されているコールバック�
 ```
 
 ### "Maplike"キー
-WebRTCのドラフト仕様ページでMaplikeが使用されているのは、現時点でRTCStatsReportのみである。
+WebRTCのドラフト仕様ページでMaplikeが使用されているのは、現時点でRTCStatsReportのみである。  
 RTCStatsReportはInterfaceだが、Maplikeという特殊な型で定義されているため、Maplikeキーを設けて出力する。
 キーの配下には"key"キーと"value"キーを配置。それぞれの値は"data_type"キーを有するオブジェクトを出力する。
 
@@ -335,7 +333,7 @@ RTCStatsReportはInterfaceだが、Maplikeという特殊な型で定義され�
 ```
 
 ### "Dictionary"キー, "Interface"キー
-DictionaryやInterfaceはクラスに相当する。  
+DictionaryやInterfaceはクラスに相当する。  
 解析データには、"Dictionary"キーや"Interface"キーの配下にそれぞれまとめられ名前をキーとして出力される。
 
 解析データ出力例
@@ -357,7 +355,7 @@ DictionaryやInterfaceはクラスに相当する。  
 ```
 
 #### "Superclass"キー
-  基底クラスがある場合、解析データに"Superclass"というキー(値は基底クラス名)が追加される。
+基底クラスがある場合、解析データに"Superclass"というキー(値は基底クラス名)が追加される。
 
 解析データ出力例
 ```javascript
@@ -399,15 +397,14 @@ DictionaryやInterfaceはクラスに相当する。  
 ```
 
 #### "Attribute"キー、"Member"キー、"Method"キー、"readonly"キー、"static"キー、"defaultValue"キー
-DictionaryやInterfaceのメンバーには、AttributeやMethod(Interface)やMember(Dictionary)がある。
-これらメンバーがある場合は、そのDictionaryやInterfaceの配下に"Attribute"キー、"Method"キー、"Member"キーの配下にまとめられ
-それぞれのメンバー名をキーとして追加される。
-それぞれのメンバー名キー配下には"data_type"キーがある。ただし、Methodメンバー配下の"data_type"キーは戻り値の型を示す。
-staticなメンバーの場合は、そのメンバー配下に"static"というキー(値はtrue)が追加される。
-readonlyのメンバー(Attributeのみ)の場合は、そのメンバー配下に"readonly"というキー(値はtrue)が追加される。
-メンバーにデフォルト値がある場合は、そのメンバーの配下に"defaultValue"というキー(値はデフォルト値)が追加される。
-メンバーに属性がある場合、そのメンバーの配下に"extAttr"キーが追加される。
-Methodメンバーに引数がある場合は、そのメンバーに"param"キーが追加される。
+DictionaryやInterfaceのメンバーには、AttributeやMethod(Interface)やMember(Dictionary)がある。  
+これらメンバーがある場合は、そのDictionaryやInterfaceの配下に"Attribute"キー、"Method"キー、"Member"キーの配下にまとめられそれぞれのメンバー名をキーとして追加される。  
+それぞれのメンバー名キー配下には"data_type"キーがある。ただし、Methodメンバー配下の"data_type"キーは戻り値の型を示す。  
+staticなメンバーの場合は、そのメンバー配下に"static"というキー(値はtrue)が追加される。  
+readonlyのメンバー(Attributeのみ)の場合は、そのメンバー配下に"readonly"というキー(値はtrue)が追加される。  
+メンバーにデフォルト値がある場合は、そのメンバーの配下に"defaultValue"というキー(値はデフォルト値)が追加される。  
+メンバーに属性がある場合、そのメンバーの配下に"extAttr"キーが追加される。  
+Methodメンバーに引数がある場合は、そのメンバーに"param"キーが追加される。  
 
 解析データ出力例
 ```javascript
