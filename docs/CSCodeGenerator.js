@@ -158,11 +158,7 @@ function generateCS(parseData, classStructs, arrayToList) {
             addCSLineWithDllImport(`private static extern void set${camName}(string instanceId, ${retType} value);`);
         }
         if (type.array) {
-            if (arrayToList) {
-                addCSLine(`public List<${t.type}> ${name}`);
-            } else {
-                addCSLine(`public ${t.type}[] ${name}`);
-            }
+            addCSLine(`public ${type.typeName}[] ${name}`);
             addCSLine('{');
             addCSLine('get');
             addCSLine('{');
