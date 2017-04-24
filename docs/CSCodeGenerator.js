@@ -212,8 +212,8 @@ function generateCS(parseData, classStructs, arrayToList) {
 
         var paramPattern = method.param_pattern ? method.param_pattern : [{pattern:[]}];
 
-        for (var i = 0, il = param_pattern.length; i < il; i++) {
-            var params = method.param_pattern[i].pattern;
+        for (var i = 0, il = paramPattern.length; i < il; i++) {
+            var params = paramPattern[i].pattern;
             var paramString = params.map(pt => {
                 var ret = `, ${pt.type} ${pt.name}`;
                 if (pt.optional) {
