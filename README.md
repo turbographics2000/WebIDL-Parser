@@ -1,9 +1,9 @@
 # WebIDL Parser
 構文解析という高度な解析を行っているわけではなく、DOMの構造から解析する方法をとっている。  
-[WebRTCのドラフト仕様ページ](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-addtransceiver)のDOM構成は下記のようになっており、この構成でパースを行う。  
+[WebRTC 1.0: Real-time Communication Between Browsers](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-addtransceiver)のDOM構成は下記のようになっており、この構成でパースを行う。  
 下記のHTML構成を見ればわかるように、クラスでパースを行う。  
 まず、クラスが"idl"のものを取得し、ループでその配下の要素をパースする。  
-WebRTCのドラフト仕様ページのWebIDLをパースすることが第一の目的で、WebRTC以外の仕様のページでも解析出来る可能性はあるが、特にrequireの要素がない場合はパースはできない。  
+[WebRTC 1.0: Real-time Communication Between Browsers](https://www.w3.org/TR/webrtc/#dom-rtcpeerconnection-addtransceiver)のWebIDLをパースできることが第一の目的で(最終目的はUnityのプラグイン形式JSとプラグイン形式JSとのプロキシーを行うC#コードの自動生成)、WebRTC以外の仕様のページでも解析出来る可能性はあるが、特にrequireの要素がない場合はパースはできない。  
 ([Media Capture and Streams](https://www.w3.org/TR/mediacapture-streams/)のページも全部を確認したわけではないがさらっと確認するとパース出来てるっぽい)  
 
 ```html
@@ -85,6 +85,8 @@ WebIDLParse()を実行する。第一引数は必須で仕様ページのdomを�
 ```javascript
 var parseData = WebIDLParse(dom, false);
 ```
+
+## デモ(準備中)
 
 
 ## 解析結果データ構造(最適化なしの構造)
