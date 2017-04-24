@@ -311,8 +311,7 @@ function generateCS(parseData, classStructs, arrayToList) {
                     addCSLine();
                     addCSLine(`namespace ${managerNameSpace}`);
                     addCSLine('{');
-
-                    addCSLine(`public class ${id}${data.Superclass ? ' : ' + data.SuperClass.join(', ') : ''}`);
+                    addCSLine(`public class ${id}${data.Superclass ? ' : ' + data.SuperClass : ''}`);
                     addCSLine('{');
                     addCSLine(`public static Dictionary<string, ${id}> Instances; `);
                     addCSLine('public string InstanceId;');
