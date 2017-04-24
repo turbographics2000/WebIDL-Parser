@@ -66,7 +66,7 @@ var managerNameSpace = 'UnityWebGLWebRTC';
 var useListClasses = [];
 
 function camelize(txt, forceUpperCase) {
-    if(txt === 'new') return 'New';
+    if (txt === 'new') return 'New';
     return txt.split('-').map((elm, idx) => {
         var arr = elm.split('');
         if (idx === 0 && !forceUpperCase) {
@@ -149,7 +149,7 @@ function generateCS(parseData, classStructs, arrayToList) {
         var camName = camelize(name, true);
         console.log('cs_type', data.cs_type);
         var type = data.cs_type[0];
-        if(type.array && !type.primitive) {
+        if (type.array && !type.primitive) {
             useListClasses.push(type.typeName);
         }
         var retType = type.proxyType === 'json' ? 'string' : type.typeName;
@@ -204,29 +204,29 @@ function generateCS(parseData, classStructs, arrayToList) {
     };
 
     var methodAddCSLine = (methodName, method) => {
-        var isVoid = method.cs_type.typeName === 'void';
-        var isPrimitive = method.cs_type.primitive;
+        var isVoid = method.cs_type[0].typeName === 'void';
+        var isPrimitive = method.cs_type[0].primitive;
+        var retType = method.cs_type[0].typeName;
+        var proxyType = method.cs_type[0].proxyType;
         var isPromise = method.promise;
-        var retType = method.cs_type.typeName;
-        var proxyType = method.cs_type.proxyType;
 
-        var paramPattern = method.param_pattern ? method.param_pattern : [{pattern:[]}];
+        var paramPattern = method.param_pattern ? method.param_pattern : [{ pattern: [] }];
 
         for (var i = 0, il = paramPattern.length; i < il; i++) {
             var params = paramPattern[i].pattern;
             var paramString = params.map(pt => {
-                var ret = `, ${pt.type} ${pt.name}`;
-                if (pt.optional) {
+                var ret = `, ${pt.cs_type.typeName} ${pt.paramName}`;
+                if (pt.cs_type.optional) {
                     if (pt.primitive) {
-                        ret += ` = ${primitiveDefault[pt.name]}`;
+                        ret += ` = ${primitiveDefault[pt.paramName]}`;
                     } else {
                         ret += ` = null`;
                     }
                 }
                 return ret;
             });
-            var paramString2 = params.map(pt => pt.name).join(', ');
-            var paramString3 = params.map(pt => pt.type + ' ' + pt.name).join(', ');
+            var paramString2 = params.map(pt => pt.paramName).join(', ');
+            var paramString3 = params.map(pt => pt.cs_type.typeName + ' ' + pt.paramName).join(', ');
 
             addCSLine();
             if (isPromise) {
@@ -287,7 +287,7 @@ function generateCS(parseData, classStructs, arrayToList) {
                         addCSLine(`${isVoid ? '' : 'return '}_${methodName}(instanceId, ${paramString2});`);
                     } else {
                         addCSLine(`var json = _${methodName}(instanceId, ${paramString2});`);
-                        addCSLine(`var ret = JsonUtility.fromJson<${retType}(json);`);
+                        addCSLine(`var ret = JsonUtility.fromJson<${retType}>(json);`);
                         addCSLine('return ret;');
                     }
                 }
@@ -321,13 +321,14 @@ function generateCS(parseData, classStructs, arrayToList) {
                     addCSLine('public string error;');
 
                     if (data.Ctor) {
-                        var ctorCSLine = function(params) {
+                        var ctorCSLine = function (params) {
+                            addCSLine();
                             addCSLine(`public ${id} (${params.map(param => param.cs_type.typeName + ' ' + param.paramName).join(', ')})`);
                             addCSLine(`{`);
                             addCSLine(`} `);
                         }
-                        if(data.Ctor.param_pattern) {
-                            for(var i = 0, il = data.Ctor.param_pattern.length; i < il; i++){
+                        if (data.Ctor.param_pattern) {
+                            for (var i = 0, il = data.Ctor.param_pattern.length; i < il; i++) {
                                 ctorCSLine(data.Ctor.param_pattern[i].pattern);
                             }
                         } else {
