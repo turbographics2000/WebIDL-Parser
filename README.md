@@ -1,20 +1,27 @@
 # WebIDL Parser
-構文解析という高度な解析を行っているわけではなく、DOMの構造(class)から解析する方法をとっている。  
-WebRTCのドラフト仕様ページのWebIDLをパースすることが目的。
-WebRTCのドラフト仕様ページのDOM構成は以下のようになっており、この構成でパースを行う。  
-[optional: 任意、require: 親classの要素があれば必須、many: 0回含む複数回]
+構文解析という高度な解析を行っているわけではなく、DOMの構造から解析する方法をとっている。  
+WebRTCのドラフト仕様ページのDOM構成は下記のようになっており、この構成でパースを行う。  
+下記のHTML構成を見ればわかるように、クラスでパースを行う。
+まず、クラスが"idl"のものを取得し、ループでその配下の要素をパースする。
+WebRTCのドラフト仕様ページのWebIDLをパースすることが目的であるため、
+ほかの仕様のページでも解析出来る可能性はあるが特にrequireの要素がない場合はパースはできない。  
+
 ```html
+optional: 任意,
+require:  親classの要素があれば必須,
+many:     任意(0回含む) 複数回
+
 <!-- Dictionary -->
 <pre class="idl">
-  <span class="idlDictionary">optional
+  <span class="idlDictionary">many
     <span class="idlDictionaryID">ruqire</span>
     <span class="idlMember">
       <span class="extAttr">optional
         <span class="extAttrName">require</span>
         <span class="extAttrRhs">optional</span>
       </span>
-      <span class="idlMemberType"></span>
-      <span class="idlMemberName"></span>
+      <span class="idlMemberType">require</span>
+      <span class="idlMemberName">require</span>
     </span>
     <span class="idlMember">many
       <span class="idlMemberType">require</span>
@@ -26,7 +33,7 @@ WebRTCのドラフト仕様ページのDOM構成は以下のようになって�
 
 <!-- Interface -->
 <pre class="idl">
-  <span class="idlInterface">optional
+  <span class="idlInterface">many
     <span class="idlCtor">optional
       <span class="extAttrName">require</span>
       <span class="idlParam">optinal
@@ -53,7 +60,7 @@ WebRTCのドラフト仕様ページのDOM構成は以下のようになって�
 
 <!-- Enum -->
 <pre class="idl">
-  <span class="idlEnum">optional
+  <span class="idlEnum">many
     <span class="idlEnumID">require</span>
     <a class="idlEnumItem">require</a>
   </span>
@@ -61,7 +68,7 @@ WebRTCのドラフト仕様ページのDOM構成は以下のようになって�
 
 <!-- Callback -->
 <pre class="idl">
-  <span class="idlCallback">optional
+  <span class="idlCallback">many
     <span class="idlCallbackID">require</span>
     <span class="idlCallbackType">require</span>
     <span class="idlParam">optional
@@ -71,9 +78,6 @@ WebRTCのドラフト仕様ページのDOM構成は以下のようになって�
   </span>
 </pre>
 ```
-上記のHTML構成を見ればわかるように、クラスでパースを行う。
-まず、クラスが"idl"のものを取得し、ループでその配下の要素をパースする。
-ほかの仕様のページでも解析出来る可能性はあるが特にrequireの要素がない場合はパースはできない。  
 
 
 ## 使用方法
