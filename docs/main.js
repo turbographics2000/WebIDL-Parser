@@ -11,7 +11,7 @@ fetch('https://www.w3.org/TR/webrtc/')
         // console.log(JSON.stringify(data, null, 4));
         generateCS(data, 'WebRTCGenerateCS');
     })
-    .then(fetch('https://www.w3.org/TR/mediacapture-streams/'))
+    .then(_ => fetch('https://www.w3.org/TR/mediacapture-streams/'))
     .then(resText => {
         var domParser = new DOMParser();
         var dom = domParser.parseFromString(resText, 'text/html');
