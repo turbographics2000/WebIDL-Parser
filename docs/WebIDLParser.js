@@ -199,7 +199,8 @@ function typeParse(typeElm) {
                 typeName: typeNames[1]
             };
         } else {
-            type.typeName = typeNames;
+            if(Array.isArray(typeNames)) debugger;
+            type.typeName = typeNames[0];
         }
         types.push(type);
     });
