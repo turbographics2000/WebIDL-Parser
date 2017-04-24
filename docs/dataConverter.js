@@ -41,6 +41,11 @@ var primitiveTypes = [
     'string'
 ];
 
+function convertToCSData(data) {
+    dataTypeParse(data);
+    paramPatternParse(data);
+}
+
 function convertToCSType(data, types) {
     var csTypes = [];
     types.forEach(type => {
@@ -113,11 +118,6 @@ function paramPatternParse(data) {
         }
         paramPatternParse(data[key]);
     });
-}
-
-function convertToCSData(data) {
-    dataTypeParse(data);
-    paramPatternParse(data);
 }
 
 function dataTypeParse(data) {

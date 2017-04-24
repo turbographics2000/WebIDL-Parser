@@ -7,6 +7,8 @@ fetch('https://www.w3.org/TR/webrtc/')
         legacySection.parentElement.removeChild(legacySection);
         console.clear();
         var data = WebIDLParse(dom, false);
-        console.log(JSON.stringify(data, null, 4));
+        convertToCSData(data);
+        //console.log(JSON.stringify(data, null, 4));
+        generateCS(data);
     })
     .catch(ex => console.log('fetch error', ex));
