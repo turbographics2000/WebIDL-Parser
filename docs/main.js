@@ -5,10 +5,21 @@ fetch('https://www.w3.org/TR/webrtc/')
         var dom = domParser.parseFromString(resText, 'text/html');
         var legacySection = dom.getElementById('legacy-interface-extensions');
         legacySection.parentElement.removeChild(legacySection);
-        console.clear();
         var data = WebIDLParse(dom, false);
         convertToCSData(data);
-        console.log(JSON.stringify(data, null, 4));
-        generateCS(data);
+        // console.clear();
+        // console.log(JSON.stringify(data, null, 4));
+        generateCS(data, 'WebRTCGenerateCS');
+    })
+    .then(fetch('https://www.w3.org/TR/mediacapture-streams/'))
+    .then(resText => {
+        var domParser = new DOMParser();
+        var dom = domParser.parseFromString(resText, 'text/html');
+        legacySection.parentElement.removeChild(legacySection);
+        var data = WebIDLParse(dom, false);
+        convertToCSData(data);
+        // console.clear();
+        // console.log(JSON.stringify(data, null, 4));
+        generateCS(data, 'MediaCaptureGenerateCS');
     })
     .catch(ex => console.log('fetch error', ex));

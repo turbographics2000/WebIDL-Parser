@@ -142,7 +142,7 @@ function saveCSManagerCode(fileName) {
     csManagerIndentLevel = 0;
 }
 
-function generateCS(parseData, classStructs, arrayToList) {
+function generateCS(parseData, zipFileName) {
     convertToCSData(parseData);
 
     var attrOrMemberAddCSLine = (name, data) => {
@@ -414,7 +414,7 @@ function generateCS(parseData, classStructs, arrayToList) {
     zip.generateAsync({ type: 'blob' })
         .then((content) => {
             var a = document.createElement('a');
-            a.download = 'cs.zip';
+            a.download = `${zipFileName || 'cs'}.zip`;
             a.href = URL.createObjectURL(content);
             a.click();
         });
