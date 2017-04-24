@@ -211,9 +211,7 @@ function generateCS(parseData, classStructs, arrayToList) {
         var proxyType = method.cs_type.proxyType;
 
         for (var i = 0, il = method.param_pattern.length; i < il; i++) {
-            var params = method.param_pattern[i];
-            if(!params) debugger; 
-            if(!params.map) debugger;
+            var params = method.param_pattern[i].pattern;
             var paramString = params.map(pt => {
                 var ret = `, ${pt.type} ${pt.name}`;
                 if (pt.optional) {
