@@ -147,8 +147,6 @@ function generateCS(parseData, classStructs, arrayToList) {
 
     var attrOrMemberAddCSLine = (name, data) => {
         var camName = camelize(name, true);
-        if(!data ) debugger;
-        if(!data.cs_type) debugger;
         console.log('cs_type', data.cs_type);
         var type = data.cs_type[0];
         if(type.array && !type.primitive) {
@@ -214,6 +212,8 @@ function generateCS(parseData, classStructs, arrayToList) {
 
         for (var i = 0, il = method.param_pattern.length; i < il; i++) {
             var params = method.param_pattern[i];
+            if(!params) debugger;
+            if(!params.map) debugger;
             var paramString = params.map(pt => {
                 var ret = `, ${pt.type} ${pt.name}`;
                 if (pt.optional) {
@@ -348,7 +348,6 @@ function generateCS(parseData, classStructs, arrayToList) {
                     }
 
                     if (data.Method) {
-                        if (id === 'RTCDataChannel') debugger;
                         Object.keys(data.Method).forEach(methodName => {
                             methodAddCSLine(methodName, data.Method[methodName]);
                         });
