@@ -1,8 +1,80 @@
 # WebIDL Parser
 構文解析という高度な解析を行っているわけではなく、DOMの構造(class)から解析する方法をとっている。  
-WebRTCのドラフト仕様ページのWebIDLをパースすることが目的。  
-ほかの仕様のページでも解析出来る可能性はあるがDOMの構造が違うとパースはできない。  
-Paserという名前にしているが、Paserというほどのものではなく、単に解析したものをオブジェクトに出力するというものである。
+WebRTCのドラフト仕様ページのWebIDLをパースすることが目的。
+WebRTCのドラフト仕様ページのDOM構成は以下のようになっており、この構成でパースを行う。  
+[optional: 任意、require: 親classの要素があれば必須、many: 0回含む複数回]
+```html
+<!-- Dictionary -->
+<pre class="idl">
+  <span class="idlDictionary">optional
+    <span class="idlDictionaryID">ruqire</span>
+    <span class="idlMember">
+      <span class="extAttr">optional
+        <span class="extAttrName">require</span>
+        <span class="extAttrRhs">optional</span>
+      </span>
+      <span class="idlMemberType"></span>
+      <span class="idlMemberName"></span>
+    </span>
+    <span class="idlMember">many
+      <span class="idlMemberType">require</span>
+      <span class="idlMemberName">require</span>
+      <span class="idlMemberValue">optional</span>
+    </span>
+  </span>
+</pre>
+
+<!-- Interface -->
+<pre class="idl">
+  <span class="idlInterface">optional
+    <span class="idlCtor">optional
+      <span class="extAttrName">require</span>
+      <span class="idlParam">optinal
+        <span class="idlParamType">require</span>
+        <span class="idlParamName">require</span>
+      </span>
+    </span>
+    <span class="idlInterfaceID">require</span>
+    <span class="idlSuperclass">optional</span>
+    <span class="idlMethod">many
+      <span class="idlMethType">require</span>
+      <span class="idlMethName">require</span>
+      <span class="idlParam">optional
+        <span class="idlParamType">require</span>
+        <span class="idlParamName">require</span>
+      </span>
+    </span>
+    <span class="idlAttribute">many
+      <span class="idlAttrType">require</span>
+      <span class="idlAttrName">require</span>
+    </span>
+  </span>
+</pre>
+
+<!-- Enum -->
+<pre class="idl">
+  <span class="idlEnum">optional
+    <span class="idlEnumID">require</span>
+    <a class="idlEnumItem">require</a>
+  </span>
+</pre>
+
+<!-- Callback -->
+<pre class="idl">
+  <span class="idlCallback">optional
+    <span class="idlCallbackID">require</span>
+    <span class="idlCallbackType">require</span>
+    <span class="idlParam">optional
+      <span class="idlParamType">require</span>
+      <span class="idlParamName">require</span>
+    </span>
+  </span>
+</pre>
+```
+上記のHTML構成を見ればわかるように、クラスでパースを行う。
+まず、クラスが"idl"のものを取得し、ループでその配下の要素をパースする。
+ほかの仕様のページでも解析出来る可能性はあるが特にrequireの要素がない場合はパースはできない。  
+
 
 ## 使用方法
 WebIDLParse()を実行する。第一引数は必須で仕様ページのdomを渡す。第二引数にtrueを渡すと、最適化された解析結果のデータを戻す。
