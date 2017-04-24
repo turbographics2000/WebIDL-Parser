@@ -153,10 +153,11 @@ function generateCS(parseData, classStructs, arrayToList) {
             useListClasses.push(type.typeName);
         }
         var retType = type.proxyType === 'json' ? 'string' : type.typeName;
+        var valueParamName = type.proxyType === 'json' ? 'json' + camelize(data.data_type.typeName, true) : data.data_type.typeName;
         addCSLine();
         addCSLineWithDllImport(`private static extern ${retType} get${camName}(string instanceId);`);
         if (!data.readonly) {
-            addCSLineWithDllImport(`private static extern void set${camName}(string instanceId, ${retType} value);`);
+            addCSLineWithDllImport(`private static extern void set${camName}(string instanceId, ${retType} ${valueParamName});`);
         }
         if (type.array) {
             addCSLine(`public ${type.typeName}[] ${name}`);
