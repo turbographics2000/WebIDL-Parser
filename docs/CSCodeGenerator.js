@@ -137,18 +137,11 @@ function saveCSManagerCode(fileName) {
 }
 
 function generateCS(parseData, classStructs, arrayToList) {
+    convertToCSData(parseData);
+
     var attrOrMemberAddCSLine = (name, data) => {
         var camName = camelize(name, true);
         var t = data.type[0];
-
-        // 型が配列かそうでないかの複数の場合は配列を選択
-        if (data.type.length > 1) {
-            data.type.forEach(type => {
-                if (type.isArray || type.isSequence) {
-                    t = type;
-                }
-            });
-        }
 
         var retType = t.isPrimitive ? t.type : 'string';
         addCSLine();
@@ -436,33 +429,3 @@ function generateCS(parseData, classStructs, arrayToList) {
         });
 }
 
-function convertToCSType(data, type) {
-
-}
-
-function generateParamPattern(data, params) {
-    params.forEach(param => {
-        convertToCSData(param, param.type);
-    });
-}
-
-function convertToCSData(data) {
-    if(typeof data !== 'object') return;
-    Object.keys(data).forEach(key => {
-        switch(key) {
-            case 'param':
-                generateParamPattern(data, data[key]);
-                break;
-            case 'type':
-                convertToCSType(data, data[key]);
-                break;
-        }
-        if(key === 'type') {
-            var csType = {};
-            if(type.sequence) {
-                csType.array = true;
-                //csType.isPrimitive = 
-            }
-        }
-    })
-}
