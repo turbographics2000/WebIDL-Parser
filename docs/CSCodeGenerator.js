@@ -334,7 +334,7 @@ function generateCS(parseData, classStructs, arrayToList) {
 
                     if (data.Attribute) {
                         Object.keys(data.Attribute).forEach(attributeName => {
-                            attrOrMemberAddCSLine(attributeName, data.attributes[attributeName]);
+                            attrOrMemberAddCSLine(attributeName, data.Attribute[attributeName]);
                         });
                     }
 
