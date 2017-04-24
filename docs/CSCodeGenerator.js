@@ -226,7 +226,9 @@ function generateCS(parseData, classStructs, arrayToList) {
                 return ret;
             });
             var paramString2 = params.map(pt => pt.paramName).join(', ');
+            paramString2 ? ', ' + paramString2 : '';
             var paramString3 = params.map(pt => pt.cs_type.typeName + ' ' + pt.paramName).join(', ');
+            paramString3 ? ', ' + paramString3 : '';
 
             addCSLine();
             if (isPromise) {
@@ -272,19 +274,19 @@ function generateCS(parseData, classStructs, arrayToList) {
                 }
                 addCSLine('}');
                 addCSLine('};');
-                addCSLine(`_${methodName}(InstanceId, ${paramString2});`);
+                addCSLine(`_${methodName}(InstanceId${paramString2});`);
                 addCSLine('});');
                 addCSLine('return promise;');
                 addCSLine('}');
             } else {
-                addCSLineWithDllImport(`private static extern ${proxyType} _${methodName}(string instanceId, ${paramString3});`);
-                addCSLine(`public ${retType} ${methodName}(string instanceId, ${paramString3})`);
+                addCSLineWithDllImport(`private static extern ${proxyType} _${methodName}(string instanceId${paramString3});`);
+                addCSLine(`public ${retType} ${methodName}(string instanceId${paramString3})`);
                 addCSLine('{');
                 if (isVoid) {
                     addCSLine(`_${methodName}(instanceId,${paramString2});`);
                 } else {
                     if (isPrimitive) {
-                        addCSLine(`${isVoid ? '' : 'return '}_${methodName}(instanceId, ${paramString2});`);
+                        addCSLine(`${isVoid ? '' : 'return '}_${methodName}(instanceId${paramString2});`);
                     } else {
                         addCSLine(`var json = _${methodName}(instanceId, ${paramString2});`);
                         addCSLine(`var ret = JsonUtility.fromJson<${retType}>(json);`);
