@@ -183,7 +183,7 @@ function typeParse(typeElm) {
         var typeDec = /([a-z]+?)<(.+?)>/i.exec(typeName);
         var type = {};
         if (typeDec) {
-            typeDecs = ['frozenarray', 'record', 'sequence'];
+            typeDecs = ['frozenarray', 'record', 'sequence', 'maplike'];
             if (typeElm.className === 'idlAttrType') typeDecs.push('promise');
             if (typeDecs.includes(typeDec[1].toLowerCase())) {
                 type[typeDec[1]] = true;
