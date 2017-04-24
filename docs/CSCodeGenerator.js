@@ -324,8 +324,8 @@ function generateCS(parseData, classStructs, arrayToList) {
                             addCSLine(`} `);
                         }
                         if(data.Ctor.param_pattern) {
-                            for(var i = 0, il = data.ctor.param_pattern.length; i < il; i++){
-                                ctorCSLine(data.ctor.param_pattern.pattern);
+                            for(var i = 0, il = data.Ctor.param_pattern.length; i < il; i++){
+                                ctorCSLine(data.Ctor.param_pattern.pattern);
                             }
                         } else {
                             ctorCSLine([]);
