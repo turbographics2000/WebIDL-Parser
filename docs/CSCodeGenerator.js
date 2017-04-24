@@ -153,7 +153,7 @@ function generateCS(parseData, classStructs, arrayToList) {
             useListClasses.push(type.typeName);
         }
         var retType = type.proxyType === 'json' ? 'string' : type.typeName;
-        var valueParamName = type.proxyType === 'json' ? 'json' + camelize(data.data_type.typeName, true) : data.data_type.typeName;
+        var valueParamName = type.proxyType === 'json' ? 'json' + camelize(data.data_type[0].typeName, true) : data.data_type[0].typeName;
         addCSLine();
         addCSLineWithDllImport(`private static extern ${retType} get${camName}(string instanceId);`);
         if (!data.readonly) {
