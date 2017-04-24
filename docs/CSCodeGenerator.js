@@ -83,6 +83,10 @@ function addCSCode(code = '', isIndent) {
     if (isIndent) addCSIndent();
     csCode += code;
 }
+function addCSLineWithDllImport(code) {
+    addCSLine('[DllImport("__Internal")]');
+    addCSLine(code);
+}
 function addCSLine(code = '') {
     if (code.startsWith('}')) csIndentLevel--;
     addCSIndent();
@@ -141,17 +145,17 @@ function generateCS(parseData, classStructs, arrayToList) {
 
     var attrOrMemberAddCSLine = (name, data) => {
         var camName = camelize(name, true);
-        var t = data.type[0];
-
-        var retType = t.isPrimitive ? t.type : 'string';
-        addCSLine();
-        addCSLine('[DllImport("__Internal")]');
-        addCSLine(`private static extern ${retType} get${camName}(string instanceId);`);
-        if (!data.isReadonly) {
-            addCSLine('[DllImport("__Internal")]');
-            addCSLine(`private static extern void set${camName}(string instanceId, ${retType} value);`);
+        var type = data.cs_type[0];
+        if(type.array && !type.primitive) {
+            useListClasses.push(type.typeName);
         }
-        if (t.isArray) {
+        var retType = type.proxyType === 'json' ? 'string' : type.typeName;
+        addCSLine();
+        addCSLineWithDllImport(`private static extern ${retType} get${camName}(string instanceId);`);
+        if (!data.readonly) {
+            addCSLineWithDllImport(`private static extern void set${camName}(string instanceId, ${retType} value);`);
+        }
+        if (type.array) {
             if (arrayToList) {
                 addCSLine(`public List<${t.type}> ${name}`);
             } else {
@@ -161,43 +165,37 @@ function generateCS(parseData, classStructs, arrayToList) {
             addCSLine('get');
             addCSLine('{');
             addCSLine(`var ret = get${camName}(InstanceId);`);
-            addCSLine(`return JsonUtility.FromJson<${t.type + 'List'}>(ret)${t.isArray ? '.list' : ''};`);
+            addCSLine(`return JsonUtility.FromJson<${t.type + 'List'}>(ret).list;`);
             addCSLine('}');
-            if (!data.isReadonly) {
+            if (!data.readonly) {
                 addCSLine('set');
                 addCSLine('{');
-                addCSLine(`var tmp = new ${t.type + 'List'}();`);
-                addCSLine('tmp.list = value;');
+                addCSLine(`var tmp = new ${type.typeName}Array();`);
+                addCSLine('tmp.array = value;');
                 addCSLine('var json = JsonUtility.ToJson(tmp);');
                 addCSLine(`set${camName}(InstanceId, json);`);
                 addCSLine('}');
             }
             addCSLine('}');
         } else {
-            addCSLine(`public ${t.type} ${name}`);
+            addCSLine(`public ${type.typeName} ${name}`);
             addCSLine('{');
             addCSLine('get');
             addCSLine('{');
-            if (t.isPrimitive) {
+            if (type.primitive) {
                 addCSLine(`return get${camName}(InstanceId);`);
             } else {
                 addCSLine(`var ret = get${camName}(InstanceId);`);
                 addCSLine(`return JsonUtility.FromJson<${t.type}>(ret);`);
             }
             addCSLine('}');
-            if (!data.isReadonly) {
+            if (!data.readonly) {
                 addCSLine('set');
                 addCSLine('{');
-                if (t.isPrimitive) {
+                if (type.primitive) {
                     addCSLine(`set${camName}(InstanceId, value);`);
                 } else {
-                    if (t.isArray) {
-                        addCSLine(`var tmp = new ${t.type + 'List'}();`);
-                        addCSLine('tmp.list = value;');
-                        addCSLine('var json = JsonUtility.ToJson(tmp);');
-                    } else {
-                        addCSLine('var json = JsonUtility.ToJson(value);');
-                    }
+                    addCSLine('var json = JsonUtility.ToJson(value);');
                     addCSLine(`set${camName}(InstanceId, json);`);
                 }
                 addCSLine('}');
@@ -206,105 +204,94 @@ function generateCS(parseData, classStructs, arrayToList) {
         }
     };
 
-    var methodAddCSLine = (method, params) => {
-        var methodName = method.name;
-        var retType = method.returnType.type;
-        var proxyRetType = method.returnType.type;
-        var rtIsPrimitive = method.returnType.isPrimitive;
-        var rtIsPromise = method.returnType.isPromise;
-        var rtIsVoid = method.returnType.isVoid;
-        if (!rtIsPrimitive) proxyRetType = 'string';
-        addCSLine();
-        if (rtIsPromise) {
-            addCSLine(`private Action<${rtIsVoid ? 'string' : proxyRetType}> __${methodName};`);
-            addCSLine('[DllImport("__Internal")]');
-            addCSCode(`private static extern void _${methodName}(string instanceId`, true);
-            params.forEach(pt => {
-                addCSCode(`, ${pt.type} ${pt.name}`);
-                if (pt.isOptional) {
-                    if (pt.isPrimitive) {
-                        addCSCode(` = ${primitiveDefault[pt.name]}`);
+    var methodAddCSLine = (methodName, method) => {
+        var isVoid = method.cs_type.typeName === 'void';
+        var isPrimitive = method.cs_type.primitive;
+        var isPromise = method.promise;
+        var retType = method.cs_type.typeName;
+        var proxyType = method.cs_type.proxyType;
+
+        for (var i = 0, il = method.param_pattern.length; i < il; i++) {
+            var params = method.param_pattern[i];
+            var paramString = params.map(pt => {
+                var ret = `, ${pt.type} ${pt.name}`;
+                if (pt.optional) {
+                    if (pt.primitive) {
+                        ret += ` = ${primitiveDefault[pt.name]}`;
                     } else {
-                        addCSCode(` = null`);
+                        ret += ` = null`;
                     }
                 }
+                return ret;
             });
-            addCSCode(');\r\n');
-            addCSLine(`[MonoPInvokeCallback(typeof(Action<string` + (rtIsVoid ? '' : ', ' + proxyRetType) + `>))]`);
-            addCSLine(`private static void res_${methodName}(string instanceId` + (rtIsVoid ? ', string error' : `, ${proxyRetType} result`) + ')');
-            addCSLine('{');
-            if (!rtIsPrimitive) {
-                addCSLine(`var res = JsonUtility.FromJson<${retType}>(result);`);
-                addCSLine(`Instances[instanceId].__${methodName}.Invoke(res);`);
-            } else {
-                addCSLine(`Instances[instanceId].__${methodName}.Invoke(` + (rtIsVoid ? 'error);' : 'result);'));
-            }
-            addCSLine('}');
+            var paramString2 = params.map(pt => pt.name).join(', ');
+            var paramString3 = params.map(pt => pt.type + ' ' + pt.name).join(', ');
+
             addCSLine();
-            addCSCode(`public Promise${rtIsVoid ? '' : '<' + retType + '>'} ${methodName}(`, true);
-            params.forEach((pt, idx) => {
-                if (idx > 0) addCSCode(', ');
-                addCSCode(`${pt.type} ${pt.name}`);
-                if (pt.isOptional) {
-                    if (pt.isPrimitive) {
-                        addCSCode(` = ${primitiveDefault[pt.name]}`)
+            if (isPromise) {
+                addCSLine(`private Action<${isVoid ? 'string' : proxyType}> __${methodName};`);
+                addCSLineWithDllImport(`private static extern void _${methodName}(string instanceId, ${paramString})`);
+                addCSLine(`[MonoPInvokeCallback(typeof(Action<string${isVoid ? '' : ', ' + proxyType}>))]`);
+                addCSLine(`private static void res_${methodName}(string instanceId` + (isVoid ? ', string error' : `, ${proxyType} result`) + ')');
+                addCSLine('{');
+                if (isPrimitive) {
+                    addCSLine(`Instances[instanceId].__${methodName}.Invoke(${isVoid ? 'error' : 'result'});`);
+                } else {
+                    addCSLine(`var res = JsonUtility.FromJson<${retType}>(result);`);
+                    addCSLine(`Instances[instanceId].__${methodName}.Invoke(res);`);
+                }
+                addCSLine('}');
+                addCSLine();
+                addCSCode(`public Promise${isVoid ? '' : '<' + retType + '>'} ${methodName}(${paramString})`);
+                addCSLine('{');
+                if (isVoid) {
+                    addCSLine(`var promise = new Promise((resolve, reject) =>`);
+                    addCSLine('{');
+                    addCSLine(`__${methodName} = (error) =>`);
+                    addCSLine('{');
+                    addCSLine('if(error == "")');
+                    addCSLine('{');
+                    addCSLine('resolve();');
+                    addCSLine('}');
+                    addCSLine('else');
+                    addCSLine('{');
+                    addCSLine('reject(new Exception(error));');
+                } else {
+                    addCSLine(`var promise = new Promise<${retType}>((resolve, reject) =>`);
+                    addCSLine('{');
+                    addCSLine(`__${methodName} = (result) =>`);
+                    addCSLine('{');
+                    addCSLine('if(result.error == "")');
+                    addCSLine('{');
+                    addCSLine('resolve(result);');
+                    addCSLine('}');
+                    addCSLine('else');
+                    addCSLine('{');
+                    addCSLine('reject(new Exception(result.error));');
+                }
+                addCSLine('}');
+                addCSLine('};');
+                addCSLine(`_${methodName}(InstanceId, ${paramString2});`);
+                addCSLine('});');
+                addCSLine('return promise;');
+                addCSLine('}');
+            } else {
+                addCSLineWithDllImport(`private static extern ${proxyType} _${methodName}(string instanceId, ${paramString3});`);
+                addCSLine(`public ${retType} ${methodName}(string instanceId, ${paramString3})`);
+                addCSLine('{');
+                if (isVoid) {
+                    addCSLine(`_${methodName}(instanceId,${paramString2});`);
+                } else {
+                    if (isPrimitive) {
+                        addCSLine(`${isVoid ? '' : 'return '}_${methodName}(instanceId, ${paramString2});`);
                     } else {
-                        addCSCode(` = null`);
+                        addCSLine(`var json = _${methodName}(instanceId, ${paramString2});`);
+                        addCSLine(`var ret = JsonUtility.fromJson<${retType}(json);`);
+                        addCSLine('return ret;');
                     }
                 }
-            });
-            addCSCode(')\r\n');
-            addCSLine('{');
-            if (rtIsVoid) {
-                addCSLine(`var promise = new Promise((resolve, reject) =>`);
-                addCSLine('{');
-                addCSLine(`__${methodName} = (error) =>`);
-                addCSLine('{');
-                addCSLine('if(error == "")');
-                addCSLine('{');
-                addCSLine('resolve();');
                 addCSLine('}');
-                addCSLine('else');
-                addCSLine('{');
-                addCSLine('reject(new Exception(error));');
-                addCSLine('}');
-                addCSLine('};');
-            } else {
-                addCSLine(`var promise = new Promise<${retType}>((resolve, reject) =>`);
-                addCSLine('{');
-                addCSLine(`__${methodName} = (result) =>`);
-                addCSLine('{');
-                addCSLine('if(result.error == "")');
-                addCSLine('{');
-                addCSLine('resolve(result);');
-                addCSLine('}');
-                addCSLine('else');
-                addCSLine('{');
-                addCSLine('reject(new Exception(result.error));');
-                addCSLine('}');
-                addCSLine('};');
             }
-            addCSLine(`_${methodName}(InstanceId${params.map(pt => ', ' + pt.name).join('')});`);
-            addCSLine('});');
-            addCSLine('return promise;');
-            addCSLine('}');
-        } else {
-            addCSLine('[DllImport("__Internal")]');
-            addCSLine(`private static extern ${proxyRetType} _${methodName}(string instanceId` + params.map(pt => ', ' + pt.type + ' ' + pt.name).join('') + ');');
-            addCSLine(`public ${retType} ${methodName}(string instanceId` + params.map(pt => ', ' + pt.type + ' ' + pt.name).join('') + ')');
-            addCSLine('{');
-            if (rtIsVoid) {
-                addCSLine(`_${methodName}(instanceId` + params.map(pt => ', ' + pt.name).join('') + ');');
-            } else {
-                if (rtIsPrimitive) {
-                    addCSLine(`${rtIsVoid ? '' : 'return '}_${methodName}(instanceId` + params.map(pt => ', ' + pt.name).join('') + ');');
-                } else {
-                    addCSLine(`var json = _${methodName}(instanceId` + params.map(pt => ', ' + pt.name).join('') + ');');
-                    addCSLine(`var ret = JsonUtility.fromJson<${retType}(json);`);
-                    addCSLine('return ret;');
-                }
-            }
-            addCSLine('}');
         }
     };
 
@@ -333,35 +320,41 @@ function generateCS(parseData, classStructs, arrayToList) {
                     addCSLine('public string InstanceId;');
                     addCSLine('public string error;');
 
-                    if (data.ctor) {
-                        addCSLine(`public ${id} (` + data.params.map(param => param.type.type + ' ' + param.type.name).join(', ') + ')');
-                        addCSLine(`{`);
-                        addCSLine(`} `);
+                    if (data.Ctor) {
+                        var ctorCSLine = function(params) {
+                            addCSLine(`public ${id} (${params.map(param => param.cs_type.typeName + ' ' + param.paramName).join(', ')})`);
+                            addCSLine(`{`);
+                            addCSLine(`} `);
+                        }
+                        if(data.Ctor.param_pattern) {
+                            for(var i = 0, il = data.ctor.param_pattern.length; i < il; i++){
+                                ctorCSLine(data.ctor.param_pattern.pattern);
+                            }
+                        } else {
+                            ctorCSLine([]);
+                        }
                     }
 
-                    if (data.attributes) {
-                        Object.keys(data.attributes).forEach(attributeName => {
+                    if (data.Attribute) {
+                        Object.keys(data.Attribute).forEach(attributeName => {
                             attrOrMemberAddCSLine(attributeName, data.attributes[attributeName]);
                         });
                     }
 
-                    if (data.members) {
-                        Object.keys(data.members).forEach(memberName => {
+                    if (data.Member) {
+                        Object.keys(data.Member).forEach(memberName => {
                             attrOrMemberAddCSLine(memberName, data.members[memberName]);
                         });
                     }
 
-                    if (data.methods) {
+                    if (data.Method) {
                         if (id === 'RTCDataChannel') debugger;
-                        Object.keys(data.methods).forEach(methodName => {
-                            var method = data.methods[methodName];
-                            method.paramPatterns.forEach(paramPattern => {
-                                methodAddCSLine(method, paramPattern);
-                            });
+                        Object.keys(data.Method).forEach(methodName => {
+                            methodAddCSLine(methodName, data.method[methodName]);
                         });
                     }
 
-                    if (data.eventHandlers) {
+                    if (data.EventHandler) {
                         data.eventHandlers.forEach(eventHandlerName => {
                             addCSLine();
                             addCSLine(`[MonoPInvokeCallback(typeof (Action<string>))]`);
@@ -382,16 +375,12 @@ function generateCS(parseData, classStructs, arrayToList) {
                         addCSLine();
                         addCSLine(`namespace ${managerNameSpace}`);
                         addCSLine('{');
-                        addCSLine(`public class ${id}List`);
+                        addCSLine(`public class ${id}Array`);
                         addCSLine('{');
-                        if (arrayToList) {
-                            addCSLine(`public List <${id}> list; `);
-                        } else {
-                            addCSLine(`public ${id}[] list; `);
-                        }
+                        addCSLine(`public ${id}[] array; `);
                         addCSLine('}');
                         addCSLine('}');
-                        saveCSCode(id + 'List.cs');
+                        saveCSCode(id + 'Array.cs');
                     }
                 });
                 break;
