@@ -226,9 +226,9 @@ function generateCS(parseData, classStructs, arrayToList) {
                 return ret;
             });
             var paramString2 = params.map(pt => pt.paramName).join(', ');
-            paramString2 ? ', ' + paramString2 : '';
+            paramString2 = paramString2 ? ', ' + paramString2 : '';
             var paramString3 = params.map(pt => pt.cs_type.typeName + ' ' + pt.paramName).join(', ');
-            paramString3 ? ', ' + paramString3 : '';
+            paramString3 = paramString3 ? ', ' + paramString3 : '';
 
             addCSLine();
             if (isPromise) {
