@@ -8,7 +8,7 @@ fetch('https://www.w3.org/TR/webrtc/')
         console.clear();
         var data = WebIDLParse(dom, false);
         convertToCSData(data);
-        //console.log(JSON.stringify(data, null, 4));
+        console.log(JSON.stringify(data, null, 4));
         generateCS(data);
     })
     .catch(ex => console.log('fetch error', ex));
