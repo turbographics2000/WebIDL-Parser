@@ -14,14 +14,7 @@ function WebIDLParse(doc, optimize) {
             var types = typeParse(groupElm.querySelector('.idlMaplike'));
             if (types) {
                 parseData.Maplike = parseData.Maplike || {};
-                parseData.Maplike[id] = {
-                    key: {
-                        data_type: [{ typeName: types[0].typeName[0] }]
-                    },
-                    value: {
-                        data_type: [{ typeName: types[0].typeName[1] }]
-                    }
-                };
+                setKeyValueType(parseData.Maplike[id], types[0].typeName);
                 if (types[0].readonly) parseData.Maplike[id].readonly = true;
                 return;
             }
@@ -81,7 +74,7 @@ function memberParse(groupElm, groupItemData, memberKind) {
                         delete memberItemData.param;
                     }
                 }
-            } 
+            }
             if (types) memberItemData.data_type = types;
             var typeDec = /([a-z]+?)<(.+?)>/i.exec(getText(elm));
             var typeDecs = ['frozenarray', 'record', 'sequence'];
@@ -192,18 +185,22 @@ function typeParse(typeElm) {
         }
         var typeNames = typeName.split(',').map(x => x.trim());
         if (type.record) {
-            type.key = {
-                typeName: typeNames[0]
-            };
-            type.value = {
-                typeName: typeNames[1]
-            };
+            setKeyValueType(type, typeNames);
         } else {
             type.typeName = typeNames[0];
         }
         types.push(type);
     });
     return types;
+}
+
+function setKeyValueType(data, typeNames) {
+    data.key = {
+        typeName: typeNames[0]
+    };
+    data.value = {
+        typeName: typeNames[1]
+    };
 }
 
 function dataOptimize(data) {
