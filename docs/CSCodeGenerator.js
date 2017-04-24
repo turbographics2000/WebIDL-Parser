@@ -184,7 +184,7 @@ function generateCS(parseData, classStructs, arrayToList) {
                 addCSLine(`return get${camName}(InstanceId);`);
             } else {
                 addCSLine(`var ret = get${camName}(InstanceId);`);
-                addCSLine(`return JsonUtility.FromJson<${t.type}>(ret);`);
+                addCSLine(`return JsonUtility.FromJson<${type.typeName}>(ret);`);
             }
             addCSLine('}');
             if (!data.readonly) {
